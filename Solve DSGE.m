@@ -1,4 +1,4 @@
-%The E
+%Here are two examples.
 % theta=0.36;
 % beta=0.99;
 % gamma=0.95;
