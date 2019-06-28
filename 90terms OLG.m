@@ -1,32 +1,9 @@
-%   Ch6_optimal_pension.m
-%   computes the transition dynamics in Ch. 6.4 of Heer (2018)
-%   VALUE FUNCTION ITERATION 
-%
-%   author: Burkhard Heer
-%   date: July 7, 2018
-%
-%	Algorithm: See Algorithm 9.2.1 in Heer/Maußner DGE Modeling
-%
-%	ASSUMPTION: The policy change is implemented gradually 
-%	(linearly between the years year_change and year_policy_final)
-%
-%
-%	First run the program for case_ss=1 and _policy_change=0 
-%	to save steady state values and benchmark transition (which saves lifetime utility of transition generations)
-%
-%	Next run the program for case_ss=0 and _policy_change=1 
+
 
 clear all     % clear variables and functions from memory
 close all     % closes all figure windows
 clc           % clears the command window and homes the cursor.
 
-
-disp('This program computes the solution to the Optimal Pension Problem');
-disp(' ' );
-disp('in the Chapter 6.4 of Heer, Public Economics - The Macroeconomic Perspective.');
-disp(' ' );
-disp('Hit any key when ready.....');
-% pause;
 tic;        % computational time
 
 % define global variables
