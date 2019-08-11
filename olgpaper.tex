@@ -1,0 +1,736 @@
+\documentclass{article}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{extarrows}
+\usepackage{epstopdf}
+\usepackage{mwe}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{algorithm}{Algorithm}[section]
+
+\title{\textbf{} \\ {\Large\itshape Pension Reform in China: Optimal Policies and Welfare }} % Title and subtitle
+
+\author{\textbf{} \\ \textit{Peilin Yang}} % Author and institution
+%\date{\today} % Date, use \date{} for no date
+\begin{document}
+\maketitle
+%\tableofcontents 
+\begin{abstract}
+
+    \setlength{\parindent}{0pt} \setlength{\parskip}{1.5ex plus 0.5ex
+    minus 0.2ex} %\noindent
+
+\end{abstract}
+ 
+\section{Introduction}
+    ~\
+
+    Pension policy and retirement policy are very important for a country's welfare improvement and economic development. How to adjust various policy tools is our main research object. As we all know, China is experiencing significant reforms, and many policies have just begun to try in China. Compared with many mature economies, China's economy data and environment are easier to reflect the effects of policies. China's economy itself is the object of policy experiments, and we can see the results more easily.
+    
+    %\begin{figure}[H]
+    %    \centering
+    %    \includegraphics[scale=0.6]{Figures/I1.PNG}
+    %    \caption{Age Dependecny Ratio}
+    %\end{figure}
+    
+    Many changes have taken place in China, which will determine the direction and results of our research. The first is the demographic structure. The aging of China's population is accelerating. In 2017, there were 158.31 million people aged 65 and over, accounting for 11.4\% of the total population. According to the data released by the National Health Commission, it is estimated that by 2020, the elderly population will reach 248 million, and the level of aging will reach 17.17\%, becoming a super-aged country. From the point of view of the age dependency ratio(Figure 1), the support ratio has increased significantly after 2000, which brings a lot of pressure to the younger generation. Considering the intensification of family planning in China in the late 1970s, it is expected that the process of population aging will reach its peak by 2040. These problems have seriously affected the economic development of our country.
+
+    %\begin{figure}[H]
+    %    \centering
+    %    \includegraphics[scale=0.6]{Figures/I2.PNG}
+    %    \caption{Saving Rate}
+    %\end{figure}
+
+    Population aging is caused by three factors: declining fertility, prolonging life expectancy and a large number of early retirement behaviors. For the aging problem, many papers have given the results of research. The first aspect is related to the savings rate. Many scholars have studied the savings behavior from different aspects: Imrohoroglu (2018) has studied the relationship between long-term care risks and savings rate. They believe that China's high savings rate is related to the lack of effective long-term care insurance mechanism. As for the relationship between pension and private savings, we can conclude from the study of Attanasio and Brugiavini (2003), Attanasio and Rohwedder (2003) that there is a substitutive relationship between them. Through the pension system, the savings rate can be effectively reduced and the consumption of the younger generation can be encouraged. On the other hand, it is related to the supply of labor force. Hu (1979) first constructed a classical labor market supply model mainly focused on the impact of the pension system on the supply of labor force. Their model has significant economic characteristics. The topic of He et al. (2015) is that how the rapid change of population structure and pension reform promoted the growth of urban residents' savings rate and labor supply in China since 1997.
+
+    %\begin{figure}
+    %    \centering
+    %    \includegraphics[scale=0.6]{Figures/I3.PNG}
+    %    \caption{Labor Supply}
+    %\end{figure}
+
+    The breakthrough point of our research is the dynamic efficiency of the economy. What we want to explore is the degree of dynamic efficiency of the economy under the condition of aging. Diamond (1965) pointed out that the competitive economy can achieve a stable state of obvious excess capital, which is not Pareto optimal. Andrew Abel et al. (1989) provided a sufficient condition for the dynamic efficiency of the two-stage OLG model to be tested empirically. The goal of our research is to find out whether the economy is dynamic and effective by simulating the economy. There are few studies in this direction at present.
+
+    Faced with the problem of population aging, pension reform is imperative. One aspect of the reform is to delay the retirement age. Obviously, this will significantly reduce the pension gap. There are few quantitative articles in this area. We will study this aspect. Faced with the problem of economic transformation and the improvement of industrial productivity, China has significantly reduced the burden of corporate social security contributions, and lowered the proportion of urban workers'basic pension insurance contributions to 16\%. China's pensions are mainly based on three pillars: basic pension, enterprise annuity and voluntary personal savings pension scheme. The first pillar here is absolute in both coverage and volume. But China's pension system is also facing great problems: first, the pressure of aging; second, the coverage rate is still insufficient, especially the second and third pillars; third, the return rate of funds is insufficient. There have been many articles on the reform of the pension system. Fehr, Kallweit, and Kindermann (2013) first proposed a Hybrid Pension system, which consists of PAYG and wage-dependent pensions. He et al.(2015) used this system to study China's labor supply in 2015, but they did not explore the optimal pension policy.
+
+    In terms of optimal pension policy, Imrohoroglu(1999) first explored the distortion effect of optimal pension policy and welfare by using large-scale OLG model. Nishiyama and Smetters (2007) studied the welfare effects of 50\% tax policy. Kitao (2014) studied welfare changes under various policies. We are different from them in that we need to explore the optimal solution under the dual policy tools, and further come to the tools of how to control the optimal policy.
+
+    In the aspect of solution method, except for a few examples, the general equilibrium model of dynamic inhomogeneous media has no analytical solution, and the analytical results are not allowed to be obtained. Algorithms for solving heterogeneous agent models with endogenous distribution have recently been introduced into economic literature. Famous studies in this field include Aiyagari (1994, 1995), Huggett (1993), Imrohoroglu, Krusell and Smith (1998) or Rios Rull (1999). We use shooting method to solve the model, and the way to solve it will be given in the article.
+
+    The article follows the following logic. In the second part, we will build a large-scale OLG model, which depicts the heterogeneity of income and age structure, and introduces a composite pension system. In the third part, we define the equilibrium state of the economy, which is the key to solving the model. The fourth part puts forward the idea of solving the model. The fifth part carries on the model calibration, mainly adopts the parameter which most articles use. Finally, the static and dynamic results of the economy are analyzed in the following ways: firstly, individuals in the economy analyze the economy from asset decision-making, consumption, labor supply and savings rate; secondly, the overall economy, we analyze the optimal policy tools and dynamic transfer.
+ 
+
+\section{The Model Economy}
+
+        In this section , we develop a large scale overlapping generations (OLG)-model developed by Auerbach and Kotlikoff(1987) with finiate life individuals ,
+    firms and government . The utility of the individual derives from consumption and rest . The company maximizes profits and determines the optimal interest rate and wage rate.
+    The government relies on pension taxes and payroll taxes to finance pensions , and Transfer payments balance government financing. 
+    Individuals in the economy face uncertainty about income and time.
+    And we assume the market is effecitive , the fertility is exogenous .
+    \subsection{Demographic Structure}
+
+            Suppose an individual is born and starts working at the age of $j=1$. The time to retire is $j=R$ and the maximum life expectancy is $j=J$.
+        The individual faces the conditional survival probability $\phi_j\in(0,1)$, which indicates the 
+        probability of survival from $j-1$ years old to $j$ years old, then the probability of survival to $j$ years old is $\Pi_{j=1}^{n}\phi_j$. Let the total number of individuals 
+        in the economy be $N_t$, and the fertility rate $n$ be a certain value.
+
+            Then based on the above information, we can deduce the age structure of the economy.
+        The proportion of people with age j to the total population is 
+
+        \begin{equation}
+            \mu_j=\frac{\phi_j}{1+n} \mu_{j-1}
+        \end{equation}
+
+        $mu_j$ denotes the proportion of age-j individuals. The sum of the proportions of each age is $\sum_{j=1}^{J}\mu_j=1$.
+    \subsection{Preferences}
+
+            We use a recursive utility function, which is constructed by Kreps and Porteus (1978) , Epstein and Zin (1989).
+        This utility function is different from the classical utility function. The ordinary CCRA utility function only 
+        considers the characteristics of the individual risk aversion, and this function considers the timeliness of utility, that is, the trade-off between the current utility and the future expected present value. 
+        From a practical point of view, individuals in the economy will also make current decisions based on future utility.
+        According to the hypothesis, the utility of a single phase comes from consumption and rest . 
+        Assuming that the total number of times for each period of the individual is $1$, the rest time is $1-l$ , $l$ denotes 
+        the working time. The functional form of the single-phase utility is 
+
+        \begin{equation}
+            u(c,l)=c^\gamma(1-l)^{1-\gamma}
+        \end{equation}
+
+        The parameter $\gamma$ represents the elasticity of substitution between consumption and rest.
+        Then the intertemporal utility planning problem can be expressed in the following form
+
+        \begin{equation}
+            V_t(a_t^s,s,\epsilon,\eta)=\max_{a_{t+1}^{s+1},c_t^s,l_t^s}
+            \Big\{u(c_t^s,l_t^s)^{\rho}+\beta\phi_sE_t[V_{t+1}^\psi(a_t^s,s+1,\epsilon,\eta^{'})]^{\frac{\rho}{\psi}}\Big\}
+            ^{\frac{1}{\rho}}
+        \end{equation}
+
+        The variable $a_t^s$ represents the assets of the $s$-year-old individuals at the term $t$ , 
+        $t$ represents the calendar time, and $s$ represents the age. $\epsilon$ indicates the heterogeneity 
+        of work efficiency, which is permanent and reflects the individual differences. $\eta$ indicates a change 
+        in work efficiency, indicating a switch between high productivity and low productivity. 
+        Similar to Imrohoroglu (2018), the state transition follows a Markov chain, which represents the transition between two states, namely health and disease.
+
+        \begin{equation}
+            \Pi(\eta,\eta^{'})=  
+            \left[
+                \begin{array}{ccc}
+                    p_{11} & p_{12} &p_{13} \\
+                    p_{21} & p_{22} &p_{23} \\
+                    p_{31} & p_{32} &p_{33} \\
+                \end{array}  
+            \right] 
+        \end{equation}
+        
+        $p_{11}$ denotes the transition of state from health to health $p_{12}$ denotes from health to sick , and so on. 
+        In real life, this shows that the individual will decline in work efficiency due to certain factors, 
+        such as diseases. $V(\cdot)$ represents the optimal value function, $\rho$ represents the intertemporal replacement 
+        elasticity coefficient, and $\psi$ represents the elasticity coefficient of risk aversion.
+        The relationship between the two parameters $\psi$ and $\rho$ embodies the preference for uncertainty. 
+        When $\psi$ and $\rho$ are the same, the value function is the form we are familiar with, 
+        and the larger the $\psi$, the smaller the preference for uncertainty.
+    \subsection{Earnings}
+        The family faces certain budget constraints. Every household's income comes from wages, 
+        capital returns and government transfers. At the beginning of each family, the asset holding $a_t^0$ is $0$, 
+        and the consumption is fully financed by the government's transfer payment. This constraint can be divided into two 
+        periods: the first part is before retirement, here we set the salary of the individual whose age is $j$ when the calendar 
+        time is $t$, then the salary of the unit time has the following form
+
+        \begin{equation}
+            w_t^s=A_tw_t\eta\epsilon e_t^s
+        \end{equation}
+
+        Here $w_t$ denotes the payroll rate, and $A_t$ denotes the technology , wages increase as social productivity increases. 
+        $e_t^s$ represents the work efficiency of an individual with age $s$ at $t$. 
+        When $0<s\leq R$, part of the return on capital should be handed over to the government at the $tau_k$ rate as a capital tax. 
+        On the other hand, wages are taxed in two parts. The first part is wage tax and the other part is pension tax. 
+        The ratios are $\tau_w$ and $\tau_p$, respectively. The transfer of government is a lump-sum form. 
+        Here we assume that the elderly do not have a legacy for future generations, and that all accidental bequests 
+        will be completely confiscated by the government. When $R<s\leq J$, households will accept additional pensions. 
+        All consumption is financed by existing capital.
+
+        As a result, the budget constraint can be represented by :
+        
+        \begin{equation}
+            c_t^s+a_{t+1}^{s+1}=
+            \begin{cases}
+            (1-\tau_w-\tau_t^{pen})w_t^s l_t^s+[1+(1-\tau_k)r_t]k_t^s+tr_t& 0<s\leq R\\
+            [1+(1-\tau_k)r_t]k_t^s+tr_t+pen_t& R<s\leq J
+            \end{cases}
+        \end{equation}
+
+        In addition, each term can borrow capital $k_t^s\ge 0$, which is a constraint for households.
+    \subsection{Production}
+        The production function is set in the form of neoclassical function, which is the same as the general model. 
+        Production function is Cobb-Douglas function, and output $Y_t$ comes from capital $K_t$ and effective human capital $A_tL_t$. 
+        There is depreciation in capital, and the depreciation rate is a constant $\delta$.
+        So:
+
+        \begin{equation}
+            Y_t=K_t^\alpha(A_tL_t)^{1-\alpha}
+        \end{equation}
+
+        The technological progress is exogenous and its rate of growth is $g_A$:
+
+        \begin{equation}
+            A_t=(1+g_A)A_{t-1}
+        \end{equation}
+
+        The firms want to maximize profits. So we can get the first-order conditions :
+        \begin{equation}
+            r_t=\alpha K_t^{\alpha-1}(A_tL_t)^{1-\alpha}-\delta
+        \end{equation}
+
+        \begin{equation}
+            w_t=(1-\alpha)K_t^\alpha(A_tL_t)^{-\alpha}
+        \end{equation}
+        So we can deduce the average growth rate of real wage will be $g_A$.
+    \subsection{Government's Budget}
+        The government's fiscal balance can be seen from both income and expenditure. 
+        Income consists of tax and accidental bequests, and tax is composed of wage tax and capital tax.
+        From the perspective of expenditure, it consists of government purchase and transfer payments, 
+        which are used to balance the budget.
+
+        \begin{equation}
+            G_t+Tr_t=T_t+Beq_t
+        \end{equation}
+
+        Government's tax revenue is given by:
+
+        \begin{equation}
+            T_t=\tau_ww_tA_tL_t+\tau_Kr_tK_t
+        \end{equation}
+
+        Government purchase is an exogenous variable, which is related to the growth rate of technology $g_A$ and 
+        the growth rate of population $n_t$.
+
+        \begin{equation}
+            G_t=G_{t-1}(1+g_A)(1+n_t)    
+        \end{equation}
+    
+    \subsection{Social Security}
+        Considering the actual situation in China, the social pension system here is different from the 
+        traditional pay-as-you-go(PAYG) pension system. This system was first proposed by He, H., Ning, L., Zhu, D.(2015). 
+        They studied the reform of China's pension system.
+
+        Pension is not only related to pension tax paid by contemporary people, but also to the individual's salary before retirement. There is a certain proportion relationship between the two parts of pension.
+        Assuming that the proportion paid by contemporaries is $m$, then the proportion of pension related to the wage of individual working period is $(1-m)$ naturally.
+        
+        \begin{equation}
+            pen_t^s=\theta_{pen}[m\bar{E}_{s,t}+(1-m)Q_j]
+        \end{equation}
+        
+        $\theta_{pen}$ denotes a certain ratio of replacement , $\bar{E}_{s,t}$ denotes the average pensions financed by the economy individuals ,
+        $Q_j$ denotes the pension related to the individual's ability of producting . 
+
+        Based on the above assumptions, we can deduce that:
+        
+        \begin{equation}
+            \bar{E}_{s,t}=\frac{\sum_{t=1}^{R-1}\sum_{\eta}e_sw_t\epsilon_t\eta_t(1-l_t)}{\sum_{t=1}^{R-1}\mu_t}
+        \end{equation}
+
+        \begin{equation}
+            Q_j=\frac{\sum_{t=1}^{R-1}\sum_{\eta}e_sw_t\epsilon_t\eta_t(1-l_t)}{R-1}
+        \end{equation}
+
+        It can be seen from the expression that $bar{E}_{s,t}$  is related to the number of individuals in the economy. The more contemporary individuals are, the more pensions they receive from their wages.
+        $Q_j$ denotes the average wage earned by an individual's effective work throughout the working period in an economy. That is to say, the more money an individual earns when he works young, the more pensions he receives. This system reflects the fairness of the individual.
+        
+        This system is different from the article published by Imrohoroglu et al. (1998) to test the IRA pension system in the United States. 
+        There are two policy variables $\theta_{pen}$ and $m$ in this system. Obviously, the bigger $theta_{pen}$ is, 
+        the heavier the burden of government is, and the bigger $m$ is, the greater the burden of contemporary working individuals will be.
+\section{Stationary Equilibria}
+    When the economy tends to be stable, the individual's behavior is consistent with the overall economic behavior: the production sector maximizes profits, 
+    the individual makes optimal planning for consumption and labor, and the commodity market clears. Similar to Imrohoroglu et al. (1995), let's define the competitive equilibrium of the economy.
+    For the overall economic variables, due to the natural exogenous growth trend of population and technology, we remove the trend of each variable.
+    Then we get the following definition :
+
+    \begin{equation}
+        \begin{aligned}
+        \tilde{Y}=\frac{Y}{A_tN_t} , \tilde{C}=\frac{C}{A_tN_t} , \tilde{L}=\frac{L}{N_t} , \tilde{Pen}=\frac{Pen}{A_tN_t} \\
+          \tilde{G}=\frac{G}{A_tN_t} , \tilde{T}=\frac{T}{A_tN_t} , \tilde{Beq}=\frac{Beq}{A_tN_t}
+        \end{aligned}      
+    \end{equation}
+        
+    and stationary individual variables:
+
+    \begin{equation}
+        \tilde{a_t}=\frac{a_t}{A_t} , \tilde{c_t}=\frac{c_t}{A_tN_t} , \tilde{pen_t}=\frac{pen_t}{A_tN_t}
+         , \tilde{tr_t}=\frac{tr_t}{A_tN_t}
+    \end{equation}
+
+    For heterogeneous agent model, we usually adopt the definition of density function to describe the dynamic transfer of economy through the transfer of density function.
+    Therefore, we set $f_t$ as a cross-sectional measure of the time t of the economy, which describes the distribution relationship between the number of economic individuals and asset holdings.
+
+    Based on above assumptions , stationary equilibrium for the government policy $\{\tau_k,\tau_w
+    ,\tau_{pen},\theta_{pen},m,\tilde{tr},\tilde{G}\}$ accoring to the price system allocation and the
+    sequence of aggregate productivity indicators ${A_t}$ that satisfy the following conditions : 
+    
+    \begin{definition}
+        Competitive equilibrium includes individual decision variables $\{\tilde{c_t^s} , \tilde{a_t^s} , \tilde{l_t^s}\}$ , 
+        firms' plans for production $\{K,N\}$ , factor prices ${w_t,r_t}$ . Government's security policy $\{m , \theta_{pen}\}$ and 
+        lump-sum transfer $beq_t$ . Then the time-invariant distributions of individuals $f_t(a_t)$ for each age 
+        $j=1,2,...,J$ such that 
+        
+        1. Population structure is stable: population growth rate $n=\frac{N_{t+1}}{N_{t}}-1$ is constant, 
+        conditional survival probability $\phi_t^s$ is independent of time as a constant, that is $\phi_t^s=\phi_t$ .
+        
+        2. The rate of technological progress is a constant $g_A$ . 
+
+        3. Individual efficiency impact satisfies the transition rule of Markov chain $\Pi(\eta,\eta^{'})$.
+
+        4. In a stable state, budget constraints can be rewritten as follows :
+        
+        \begin{equation}
+            \tilde{c_t^s}+(1+g_A)\tilde{a_{t+1}^{s+1}}=
+            \begin{cases}
+            (1-\tau_w-\tau_t^{pen})\tilde{w_t^s} l_t^s+[1+(1-\tau_k)r_t]\tilde{k_t^s}+\tilde{tr_t}& 0<s\leq R\\
+            \\
+            [1+(1-\tau_k)r_t]\tilde{k_t^s}+\tilde{tr_t}+\tilde{pen_t}& R<s\leq J
+            \end{cases} 
+        \end{equation}
+
+        In addition , $l_t^s\in[0,1]$ , and $\tilde{a_t^s}\ge 0$ . 
+
+        5. In this case, individual dynamic programming lifelong asset changes, consumption, and labor supply, this behavior is based on state variables 
+        $\epsilon$ and $\eta$ . Finally, when the economy reaches a steady state, the optimal strategy does not depend on time, but only on the current state.
+        We can get the optimal policy function $\tilde{k^{'}}(\tilde{k},s,\epsilon,\eta)$ , $\tilde{c}(\tilde{k},s,\epsilon,\eta)$ ,
+        $l(\tilde{k},s,\epsilon,\eta)$ . 
+
+        6. The firm's optimal factor price sequence In the case of efficient market, the company's profit is zero.
+
+        7. According to the density function, we can find the variables of the whole economy, which is the sum of the individual economy.
+        
+            \begin{equation}
+                \tilde{K}_{t+1}=\frac{1}{N_{t+1}}\sum_{\tilde{k_t}}\sum_{s}\sum_{\epsilon}\sum_{\eta}
+                \tilde{k^{'}_t}(\tilde{k},s,\epsilon,\eta)f_t(\tilde{k},s,\epsilon,\eta)
+            \end{equation}
+
+            \begin{equation}
+                \tilde{L}_{t+1}=\frac{1}{N_{t}}\sum_{\tilde{k_t}}\sum_{s}\sum_{\epsilon}\sum_{\eta}
+                \eta\epsilon e^s_t\tilde{l_t}(\tilde{k},s,\epsilon,\eta)f_t(\tilde{k},s,\epsilon,\eta)
+            \end{equation}
+
+            \begin{equation}
+                \tilde{C}_{t+1}=\frac{1}{N_{t+1}}\sum_{\tilde{k_t}}\sum_{s}\sum_{\epsilon}\sum_{\eta}
+                \tilde{c_t}(\tilde{k},s,\epsilon,\eta)f_t(\tilde{k},s,\epsilon,\eta)
+            \end{equation}
+
+            \begin{equation}
+                \begin{aligned}
+                    \tilde{Beq}_{t+1}=\frac{1}{N_{t+1}}\sum_{\tilde{k_t}}\sum_{s}\sum_{\epsilon}\sum_{\eta}(1-\phi_t^s)[1+(1-\tau_k)r_{t+1}] \\
+                \tilde{k^{'}_t}(\tilde{k},s,\epsilon,\eta)f_t(\tilde{k},s,\epsilon,\eta)
+                \end{aligned}
+            \end{equation}
+
+            \begin{equation}
+                \tilde{T}_t=\tau_ww_t\tilde{L}_t+\tau_kr_t\tilde{K}_t
+            \end{equation}
+        
+        8. The government budget is balanced. Transfer payment $\tilde{tr}$ is used to balance the budget.
+
+            \begin{equation}
+               \tilde{T}_t+\tilde{Beq}_t=\tilde{G}+\tilde{tr}    
+            \end{equation}
+        
+        9. Social security system is balaned :
+        
+            \begin{equation}
+                \tilde{Pen}=\tau_t^{pen}w_t\tilde{L}_t
+            \end{equation}
+        
+        10. Goods market clears , capital depreciates at the rate of $\delta$ : 
+
+            \begin{equation}
+                \begin{aligned}
+                   \tilde{Y_t}&=\tilde{K}_t^\alpha\tilde{L}_t^{1-\alpha} \\
+                   &=(1+g_A)\tilde{K_{t+1}}-(1-\delta)\tilde{K}_t+\tilde{C}_t+\tilde{G}_t
+                \end{aligned}
+            \end{equation}
+        
+        11. The economy meets certain dynamic transfer rules. From $t$ period to $t + 1$ period, 
+        people on the same assets can get the next assets through the assets of the current period according 
+        to the strategy function already obtained. In this case, the distribution of the asset 
+        density function will be transferred. The person on the same asset in the new density 
+        function is obtained from the person transfer under different initial states in the previous period. 
+        By iterating this density distribution function continuously, we can get the economic status of each period.
+
+        So the cross-sectional measure $f_t$ evolves :
+
+        \begin{equation}
+            \begin{aligned}
+                f_{t+1}(\tilde{k},s,\epsilon,\eta)=\sum_{\tilde{k_t}}\sum_{s}\sum_{\epsilon}\sum_{\eta}F_t(\tilde{k},s,\epsilon,\eta)
+               f_{t}(\tilde{k},s,\epsilon,\eta)
+            \end{aligned}   
+        \end{equation}
+        
+        In the finite discrete state space, $\tilde{k}\in\mathcal{K},s\in\mathcal{S},\epsilon\in\mathcal{E},\eta\in\mathcal{M}$ .
+        The transition rule can be given by :
+
+        \begin{equation}
+            F_t(\tilde{k},s,\epsilon,\eta)=
+            \begin{cases}
+                \phi_s\Pi(\eta|\eta^{'})& if \quad \tilde{k}\in\mathcal{K} , s+1\in\mathcal{S} , \epsilon\in\mathcal{E} , \eta\in\mathcal{M} \\
+                \\
+                0& else 
+            \end{cases}      
+        \end{equation}
+
+        For an individual in the initial state, we assume that his probability in each state is equal. That is to say, his relative number of individuals in each discrete space is the same:
+
+        \begin{equation}
+            f_{t}(\tilde{k},1,\epsilon,\eta)=
+            \begin{cases}
+                N_{t+1}\Gamma(\epsilon,\eta)& if\quad 0\in\mathcal{K}\\
+                \\
+                0& else
+            \end{cases}
+        \end{equation}
+        
+        The initial distribution $\Gamma(\epsilon,\eta)$ is : 
+
+        \begin{equation}
+            \Gamma(\epsilon,\eta)=
+            \begin{cases}
+                \frac{1}{4}& \epsilon=\epsilon_1,\eta=\eta_1\\
+                \\
+                \frac{1}{4}& \epsilon=\epsilon_1,\eta=\eta_2\\
+                \\
+                \frac{1}{4}& \epsilon=\epsilon_2,\eta=\eta_1\\
+                \\
+                \frac{1}{4}& \epsilon=\epsilon_2,\eta=\eta_2\\
+            \end{cases}
+        \end{equation}
+    \end{definition}
+\section{Compution Method}
+    For the individual in the economy, the recursive utility function should adopt the dynamic programming method to solve the optimal strategy. Individuals plan their lifelong strategies at an early stage. Because of the uncertainty, shooting method can not be used. This method can only be used in the deterministic summation. Therefore, we adopt K. Krusell and Smith (1998) method to iterate the density function.
+
+    For dynamic programming problems, finite-term dynamic programming and infinite-term dynamic programming are different. In contrast, infinite dynamic programming can be regarded as a homogeneous problem, because there is no difference between different time and infinite time. However, for a finite terms problem, this is not the same, different time will start to make the problem is not homogeneous. So we can only start planning from the last phase.
+
+    As far as the last issue is concerned, the value function is zeros, so the value function is :
+
+    \begin{equation}
+        V_t(a_t^J,J,\epsilon,\eta)=\max_{a_{t+1}^{J+1},c_t^J,0}u(c_t^J,0)
+    \end{equation}    
+
+    According to our assumptions, $a^{J+1}=0$ . Next we can covert the dynamic programming problem into 
+
+
+    \begin{equation}
+        V_t(a_t^s,s,\epsilon,\eta)=\begin{cases}
+            \max_{a_{t+1}^{s+1},c_t^s,l_t^s}
+            \Big\{u(c_t^s,l_t^s)^{\rho}+\beta\phi_sE_t[V_{t+1}^\psi(a_t^s,s+1,\epsilon,\eta^{'})]^{\frac{\rho}{\psi}}\Big\}
+            ^{\frac{1}{\rho}}& \\
+            \\
+            s=1,\dots,R-1\\
+            \\
+            \max_{a_{t+1}^{s+1},c_t^s,0}
+            \Big\{u(c_t^s,0)^{\rho}+\beta\phi_sE_t[V_{t+1}^\psi(a_t^s,s+1,\epsilon,\eta^{'})]^{\frac{\rho}{\psi}}\Big\}
+            ^{\frac{1}{\rho}}& \\
+            \\
+            s=R,\dots,J.
+            \\
+        \end{cases}
+    \end{equation}
+    When calculating multivariate optimization problems, we can express all decision variables in terms of state variables. 
+    If we use budget constraints instead, we determine the interval and search for the optimal value in a certain range. 
+    Here we use the so-called golden section search method, the basic idea of this method is to gradually narrow the interval. 
+    In the next step, select two points in the interval and select a lower value. The right side of the above equation becomes 
+    the new limit point of the interval. The golden section search method optimizes the selection of these new points, 
+    which can ensure that the number of searches is minimum. This process keeps iterating until the interval length is small enough, 
+    and then we stop. 
+    
+    For a working agent, the problem of maximization is more complex because he also chooses his optimal labor supply. 
+    There are various numerical methods to calculate this two-dimensional optimization problem. 
+    Here we choose to transform the problem into two nested one-dimensional optimization problems, 
+    and apply the golden section search in the outer cycle to calculate the capital in the next period and directly 
+    from the first-order conditions, and work with the help of Gauss-Newton algorithm. Optimize the inner cycle 
+    of selection. Once the individual optimization problem is solved, we can aggregate individual savings and labor 
+    supply to derive the total amount and update our initial estimates of $\tilde{K}$, $\tilde{L}$ and factor prices 
+    $\tilde{w_t}$, $r$. Next, the value of $\tau_{pen}$ and $tr_t$ will be calculated through the budget balance 
+    between the government and the pension system. We update the old values by weighted average and iterate until 
+    convergence. The complete algorithm is described in the following procedure.
+
+    \begin{algorithm}
+        ~\
+
+        Step 1 : Guess the initial steady-state values, including $\tilde{K}$, $\tilde{L}$, and accident bequest $Beq_t$.
+        
+        Step 2 : The optimal strategy function is calculated through the dynamic programming process, and the value function iteration method is used in this process.
+
+        Step 3 : Calculate the sequence of government strategies $w_t$ , $r_t$ , $\tilde{tr}$ , $\tau_{pen}$ , $m$ , and $pen_t$.
+
+        Step 4 : Calculate the overall economic variables for each period $\tilde{K}$, $\tilde{L}$, $Beq_t$.
+
+        Step 5 : According to market clearing, budget balance and other conditions, iterate the economic total variables until step 3 convergence . 
+    
+    \end{algorithm}
+
+
+
+
+\section{Calibration}
+    ~\
+    In this paper, in order to adapt to the development of China's economy, our calibration strategy is to select commonly used parameters in the literature.
+    \subsection{Demographics}
+        ~\
+        We first assume that the period of the model is one year. In this case, we calibrate the model. According to Imrohoroglu(1998), individuals are born at the age of 21, when $s = 1$. Individuals in the economy retire at $s=41$ and live up to $s = 65$ years, with a calendar of 85 years. If s is older than 85 years old, the survival probability is zero.\footnote{China generally stipulates that higher-level occupational retirement can be extended.}
+        Another aspect is conditional survival probability ${\phi}_{s=1}^J$, the data can be derived from China Census 2018 .
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/spro.eps}
+            \caption{Conditional Survival Probability of 2018}
+        \end{figure}
+        
+        We set the fertility rate from article Imrohoroglu(2018). Since urban population accounts for about 40\% of China's population, from 1980 to 2011, each couple had 1.3 children $(0.4\times1+0.6\times1.5=1.3)$, we adopted the one-child policy to set the fertility rate in the economy at $n=0.65$.
+        
+        %\begin{figure}
+        %    \centering
+        %    \includegraphics[scale=0.6]{Figures/C1.PNG}
+        %    \caption{Age Structure and Model}
+        %\end{figure}
+        
+        Based on the above data, we can calculate the population structure of the model. By comparing it with the actual data, we can see that the population structure of the model is roughly consistent with the model.
+    \subsection{Labor Wage}
+        ~\
+        First, we calibrate the efficiency data. The first aspect is the random impact of income, which is given by $log(\mu_j)=\theta log(\mu_{j-1})+v_j$.
+        Based on the research of He, Ning, Zhu(2015) , we take $\theta=0.86$ and variance $\sigma_v^2=0.06$ . 
+        Then we use the technology of Tauchen(1986) and Imrohoroglu(2018) , now we discretize the process into Markov chain 
+
+        \begin{equation}
+            \Pi(\eta,\eta^{'})=  
+            \left[
+                \begin{array}{ccc}
+                    0.9259 & 0.0741 & 0 \\
+                    0.235 & 0.953 & 0.0235 \\
+                    0 & 0.0741 & 0.9259 \\
+                \end{array}  
+            \right] 
+        \end{equation}
+
+        and the value $\mu=\{0.36,1.0,2.7\}$ .
+
+        On the other hand , we calibrate the age-specific labor efficiencies $e_s$ . Based on He, Ning , and Zhu(2015) , they use the data in CHNS. 
+        They used CHNS to obtain data on the average working hours per worker per week, which were calculated on the basis of two questions. " C5: For how many days in a week, on the average, did you work ?" and "C6: For how many hours in a day, on the average, did you work?" 
+        The result is shown in following figure : 
+        
+        %\begin{figure}
+        %    \centering
+        %    \includegraphics[scale=0.6]{Figures/C2.PNG}
+        %    \caption{Age-Efficiency Profile}
+        %\end{figure}
+    \subsection{Technology and Preferences}
+        Based on Song, Storesletten and Zilibotti(2011), depreciation ratio $\delta=10\%$ and capital share $\alpha=0.5$.
+        The growth rate of technology is set according to the way of Imrohoroglu(2018), they set the TFP factor
+        is $\gamma_t=\big(\frac{A_{t+1}}{A_t}\big)^{\frac{1}{1-\alpha}}=1.062$ , so the $g_A=0.031$ .
+        
+        As for parameters of preferences, we set them from Krueger and Kubler(2006). 
+        The utility function parameter $\sigma=2$, then $\psi=1-\sigma=-1$ , $\rho=-1$ and subjective discount factor $\beta=0.92$ . 
+
+    \subsection{Pension System}
+        ~\
+        According to the paper of He, Ning, Zhu(2015), they set the replacement ratio $\theta_{pen}=0.5$ $m=1$ and average
+        hours ratio $\bar{l}=0.379$.
+    
+\section{Results}
+    \subsection{Individual Policy}
+        ~\
+        According to the algorithm, we must first judge and calculate the dynamic transfer of economy. Only by relying on the solution of economic stability can we carry out further calculation. The so-called stable economic distribution refers to the functional relationship between age and economic variables, which highlights the characteristics of the economy. Let's show some stable distributions of variables.
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/C_Policy.eps}
+            \caption{Consumption Policy for $R=60$ and $R=65$}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/LS_Policy.eps}
+            \caption{Labor Supply Policy for $R=60$ and $R=65$}
+        \end{figure}
+        \begin{figure}[H] 
+            \centering
+            \includegraphics[scale=0.6]{Figures/S_eps.pdf}
+            \caption{Saving Rate Policy for $R=60$ and $R=65$}
+        \end{figure}
+    \subsection{Retirement System Reform and Asset Profile}
+        ~\
+        In recent years, with the aggravation of population aging and the increasing pressure of pension payment, 
+        there are more and more discussions about delaying retirement age. Some scholars believe that delayed retirement 
+        can reduce the dependency ratio (the ratio of non-working-age population to the number of working-age population) 
+        and alleviate the pressure of pension payment to a certain extent, but aging is the trend of social development, 
+        and delayed retirement age can not fundamentally solve the problem. Statistics from the World Social Security Research 
+        Center of the Chinese Academy of Social Sciences show that under the benchmark situation of 16\% enterprise 
+        contribution rate, the basic pension fund for urban enterprise employees will be in deficit in 2028 and run out in 2035. 
+        Many media joked that this meant "the post-80s generation will have no money to support the elderly".
+        At the same time, China is stepping into an aging society with a shrinking population of working age. 
+        According to the data of the National Bureau of Statistics, in 2018, China's population aged 60 and over was 249 million, 
+        accounting for 17.9 \% of the total population. According to the forecast issued by the National Office for Ageing in 2015, 
+        by 2022, the number of the aged population over 60 will increase to 268 million, with the proportion rising to 18.5\%; 
+        by 2036, the proportion of the aged population will further increase to 423 million, with the proportion rising to 29.1 \%; 
+        by 2053, the proportion of the aged population will reach a peak of 487 million, reaching 34.8 \% of the national population.
+        The World Social Security Research Center of the Chinese Academy of Social Sciences points out that in terms of the system 
+        support rate, the payment pressure of basic old-age insurance for urban employees will continue to increase in the future. 
+        Simply put, a retiree will be supported by nearly two contributors in 2019, but almost one contributor will need to support 
+        one retiree around 2050. China's existing retirement system can be traced back to the 1950s, when the average life expectancy 
+        of the Chinese was only 45 years old, and almost all of the labor was high-intensity manual labor, with a very low degree of 
+        mechanization and modernization. Therefore, we hope to improve the economic conditions by changing the backward retirement policy, so whether changing the retirement age can improve the economic welfare is what our model will explore.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/AP60.eps}
+            \caption{Asset Profile for $R=60$}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/AP65.eps}
+            \caption{Asset Profile for $R=65$}
+        \end{figure}
+        From Figure 1, we can see that the change of assets with age increases first and then decreases, which accords with the law of most similar studies. It can be seen that the turning point occurs around the time of retirement. After retirement, individuals begin to consume the assets they saved before, which gradually reduces the assets. In the absence of inheritance, changes in assets eventually tend to zero.
+
+        Comparing two retirement policies of different ages, we can see that the biggest asset in the whole age path is changing. According to the principle of economics, consumption is an important part of national output. On the one hand, the increase of consumption will promote economic development, on the other hand, it will reduce the pressure of pension gap on the government.
+        
+        
+    \subsection{Consumption}
+        Consumption can be compared in two ways. On the one hand, for people with high productivity and low productivity, the path of assets is very different, which reflects that through the investment of education, personal ability can be improved, which can promote economic development. This shows that the heterogeneity of individual ability and education is the main difference in determining consumption path. On the other hand, from the point of view of retirement policy at different ages, the increase of retirement age will further increase consumption, which may promote economic development. In the following sections, we will explore whether this will promote economic development and social welfare improvement.
+        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/CP60.eps}
+            \caption{Consumption Profile for $R=60$}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/CP65.eps}
+            \caption{Consumption Profile for $R=65$}
+        \end{figure}
+        
+    \subsection{Labor Supply}
+        ~\
+        The supply of labor force will directly determine the unemployment and employment situation, which is affected by many factors. Then we will explore how the supply of labor will change in the case of aging.
+        
+        In recent years, population aging has attracted widespread attention of the society, one of the important reasons is that population aging will affect a country's economic growth by influencing factors such as labor supply, savings and capital investment. This paper studies the relationship between population aging and China's economic growth from the perspective of labor supply and capital investment. By selecting panel data of 31 provinces, municipalities and autonomous regions from 2002 to 2013, we empirically test the impact of population aging on economic growth. The study finds that the aging population has a negative effect on China's economic growth, and to some extent inhibits the positive effect of human capital on economic growth. Under the background of aging population, human capital investment has a significant effect on economic growth. Therefore, increasing human capital investment, improving labor knowledge reserve and professional quality are the inevitable choice to deal with the aging population and promote economic growth.
+        
+        Intuitively, aging will increase the burden of the younger generation and should increase the supply of labor.
+
+        
+        From the data point of view, we can still see from two aspects. On the one hand, the supply of labor is still increasing first and then decreasing, which is determined by the characteristics of the model. Different retirement age leads to different labor supply.
+        
+        Firstly, without changing the retirement age, the aging makes the labor supply of each age increase significantly. From the perspective of market equilibrium, the increase of labor supply will inevitably lead to more incentives for competition in the employment market.
+
+        Secondly, changing the retirement age can significantly reduce the pressure of the labor market, and relatively reduce the pressure of the labor supplier.
+        
+        \begin{figure}[H] 
+            \centering
+            \includegraphics[scale=0.6]{Figures/L_D60_Policy.eps}
+            \caption{Labor Supply Profile for $R=60$}
+        \end{figure}
+
+        \begin{figure}[H] 
+            \centering
+            \includegraphics[scale=0.6]{Figures/L_D65_Policy.eps}
+            \caption{Labor Supply Profile for $R=65$}
+        \end{figure}
+
+
+    \subsection{Saving Rate and Dynamic Efficiency}
+        ~\
+
+        Many scholars have done some research on the savings rate.Imrohoroglu (2018) uses a model economy full of altruistic factors to compare it with China's economy and to examine the role of various factors in the change of savings rate. It is concluded that the interaction between long-term capital risk and demography plays an important role in improving the savings rate. The savings rate will increase from 20\% in the 1980s to about 25\% in 2010. The possibility that the government or family members are insufficient in old age insurance can generate a substantial increase in the savings rate in China.
+        He, H., Ning, L., Zhu, D.(2015) points out that for working age, the impact of rapid aging and pension reform on savings rate and labor supply increases with age, and pension reform plays a dominant role because individuals are getting closer to retirement age. This is mainly due to the rapid aging of the post-retirement savings rate.
+        In the framework of this paper, what we want to study next is the impact of pension reform on the savings rate.
+
+        
+
+        From the results (Figure 5) , we can see that the impact of reform on the savings rate is not great, or even some improvement, which is a negative factor in economic development.
+        
+        Dynamic efficiency is the core issue in analyzing the impact of fiscal policy, that is, pension policy reform. Diamond (1965) pointed out that a competitive economy 
+        can achieve a stable state, in which there is obviously too much capital. If the population growth rate exceeds the stable state of marginal international capital products, or if the sustained investment of the economy exceeds profits, then the economy is considered to be dynamic inefficient.  Accumulative improvements can be achieved in a dynamic, inefficient economy that allows the current generation. Part of the capital stock, and then keep the consumption of all future generations unchanged. If the equilibrium of social security is not dynamic and effective, there is no need for incomplete market and improved risk allocation to provide a normative reason for the introduction of PAYG social security. Andrew Abel et al. (1989) provided a sufficient condition for the dynamic efficiency of the two-stage OLG model, which can be experientially tested. In implementing this test, they strongly supported the hypothesis that the U.S. economy (and the economies of other industrialized countries) was dynamic and effective.
+        Next, we explore the dynamic effectiveness of the model economy under the conditions of pension reform.
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/S60.eps}
+            \caption{Saving Rate for $R=60$}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{Figures/S65.eps}
+            \caption{Saving Rate for $R=65$}
+        \end{figure}
+
+        From Figure 6, we can see that the economy in this situation can not satisfy Abel's dynamic optimum conditions.The reason is that because of the high savings rate, the high savings rate can not bring benefits to the economy. Because the savings did not translate into real welfare in the economy, it could not improve the Pareto efficiency of the economy.
+
+    \subsection{Optimal Policy}
+        
+        Pay-as-you-go pension system has many effects on welfare. First, social security provides part of the insurance through intergenerational and intragenerational income redistribution. Social insurance, to a certain extent, prevents the uncertainty of personal income, because it redistributes from high-income workers to low-income workers and bears part of the impact of income changes. Secondly, because most households in the economy are constrained by credit in low-income period, they can not use debt, which leads to worsening welfare effect. Social insurance benefits reduce welfare and the supply of labour. Third, additional savings mean that the total consumption of different dynamic economic efficiencies (in this model) will also decrease. Whether the consumption effect can compensate for the huge welfare distortions caused by lower labor supply and savings, which can usually be quantitatively determined by models.
+        Next, we explore the effects of using social security policy tools.
+        \subsubsection{Policy tools : $\theta_{pen}$}
+            $\theta_{pen}$ represents the replacement rate of pension, which is a certain proportion of wages. From a model point of view, the larger the proportion, the greater the burden on behalf of contemporary people.
+        
+            In Figure 7, we can see that the welfare effect of taxation is delayed. Firstly, taxation will reduce the overall welfare of the economy. Because individuals in the younger part of the economy consume more, they account for most of the welfare in the economy. Tax policy will lead to a decline in the welfare of the younger generation in the economy. However, from a long-term perspective, long-term economic welfare is on the rise, the welfare of the older generation will improve, then pension policy will play a role in welfare.
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.6]{Figures/W.eps}
+                \caption{Policy : $\theta_{pen}$}
+            \end{figure}
+        \subsubsection{Policy tools : $m$}
+            The role of this policy tool is to adjust the proportion of personal income and the payment of the same period of labor providers, that is to say, the larger the proportion of m, the greater the burden of labor providers. However, from the perspective of social equity, the increase of M ratio will reduce the degree of social inequality. This characteristic can be expressed by Gini coefficient too. Gini coefficient is a commonly used international index to measure the income gap of residents in a country or region. The maximum Gini coefficient is "1" and the minimum is "0". The closer the Gini coefficient approaches zero, the more equal the income distribution tends to be. International practice regards income below 0.2 as absolute average, 0.2-0.3 as comparative average, 0.3-0.4 as relatively reasonable income, 0.4-0.5 as large income gap, when Gini coefficient reaches above 0.5, it means income disparity.
+
+            In terms of Gini coefficient, pension reform does not contribute to the change of social equity. There is a wage-dependent mechanism in the pension system.
+            Obviously, the convexity of the new Lorentz curve is greater.
+
+           \begin{figure}[H]
+               \centering
+               \includegraphics[scale=0.6]{Figures/Wm.eps}
+               \caption{Policy : $m$}
+           \end{figure}
+%
+           % \begin{figure}
+           %     \centering
+           %     \includegraphics[scale=0.6]{Figures/6.PNG}
+           %     \caption{Gini}
+           % \end{figure}
+
+    \subsection{Dynamic Transition}
+        
+        \subsubsection{Dynamic Transition : Aggregate Economy}
+            So far, our analysis has focused on comparatively static analysis. Next, we will study the economic dynamics and the changing characteristics of the model economy. As a result, we believe that the economy has begun to grow in 2015, and that the population size is in line with the use of the economy. Specifically, we assume that the survival probability and population growth rate of the model population are the same as those predicted by the original data. Since 2100, the population variable has remained unchanged, equal to the population of 2100. Therefore, we further believe that by 2200, the transfer of the new stability system has been completed. In addition, the level of government expenditure and transfer remained unchanged in 2015.
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.6]{Figures/KT.eps}
+                \caption{K}
+            \end{figure}
+         
+        \subsubsection{Dynamic Transition : Policy Changes}
+            Next, we study the path of policy change. Here we set the substitution rate and the two types of pension ratio as a constant. We need to clearly distinguish what policy is changing and what policy is unchanged.
+            
+            From the graph, the change trend of policy and economy is basically consistent.
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.6]{Figures/LT.eps}
+                \caption{L}
+            \end{figure}
+
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.6]{Figures/YT.eps}
+                \caption{Y}
+            \end{figure}
+    
+
+
+\section{Conslusions}
+%\section*{References}
+%    \bibliographystyle{elsarticle-harv}
+    
+%    \bibitem{ref1} Krueger, D., & Kubler, F. (2006). Pareto-Improving Social Security Reform when Financial Markets Are Incomplete!? The American Economic Review, 96(3), 737-755.
+        
+
+
+\end{document}
