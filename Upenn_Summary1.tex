@@ -1,0 +1,374 @@
+\documentclass{article}
+\usepackage{caption}
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{extarrows}
+\usepackage{mwe}
+\newtheorem{remark}{Remark}[section]
+\begin{document}
+\section{Reference}
+\section{Empirical Articles}
+
+\subsection{Social proximity and firm performance: the importance of family member ties in workplaces}
+    ~\
+
+    This article assesses the role of social proximity, i.e. the concentration of family members in firms.
+    
+    The innovation of this article is: it addresses the relation betweeen family linkages and regional differences in frim productivity
+    in a more systematic way. It shows that the impact of social proximity on firm performance differ
+    depending on the spatial context and the access to agglomeration externalities.
+
+    In terms of data, the dependent variable is labour productivity defined as per capita value-added. The main independent variable 
+    is a proxy for social proximity(FM). The control variables include a number of firm-level characteristics:
+    
+    \emph{1. high education(human capital)} 
+    
+    \emph{2. firm size(employment)} 
+    
+    \emph{3. capital(the depreciation on fixed assets as a proxy for capital). }
+    
+    \emph{4. regional size: total number of employees by region and year(N/100)}
+    
+    \emph{5. specialization: LQ}
+
+    In order to control the effects of agglomeration economies with two measures. One is location quotient(LQ), 
+    \begin{equation}
+        SP_{ir}=\frac{e_{ir}/e_r}{e_i/e}
+    \end{equation}
+    the other is using log regional employment size. 
+
+    $SP_{ir}$ is the degree of specialization in industry $i$ in region $r$, 
+    $e_{ir}$ is the number of employees in two-digit industry $i$ in region $r$, 
+
+    The model is:
+    \begin{equation}
+        lnY_i=\beta_0+\sum_{i=1}^n\beta_1X_i+\sum_{i=1}^n\delta_2A_i+\epsilon
+    \end{equation}
+    $lnY_i$ represents average labour productivity in firms $i$, 
+    $\sum_{i=1}^n\beta_1X_i$ represents the sum of different family ties and $\sum_{i=1}^n\delta_2A_i$ represents the sum of control variables.
+    
+    The results indicate that:
+
+    \emph{1. Concentration of FM positively affect performance, including the jointly regressed with both firm and regional level factors. (Especially for smaller firms)}
+
+    \emph{2. FM significantly influences performance in low technological manufacturing firms with a relatively low educated workforce. }
+
+    \emph{3. Social proximity should be less important in large specialized regions because of the presence of specialzied skills.}
+
+    From the perspective of robustness, he performed four main robustness checks: estimating the marginal effects 
+    for each variable at the mean of the other variables on model 1 (FM only), 
+    model 3 (FM + controllers), model 8 (OLS with all interactions) and model 9 (FE with all interactions). 
+    It is verified that FM is an attribute that mainly affects the performance of small companies.
+
+
+\subsection{Familial relationships and firm performance: the impact of entrepreneurial family relationships}
+    ~\
+
+    The aim of the present paper is to bring further clarity to the question of what types of family relationships within the firm may positively influence performance. 
+    This article argue that different forms of relationships in the entrepreneur's family (children, spouse and siblings) are particularly strong forms of social relations that can transform the 
+    influence of cognitive proximity in the firm.
+
+    They propose three hypotheses: 
+    
+    \emph{1. Strong entrepreneur–children relationships (co-occurrence) in the firm will mitigate/ lower the negative effects of similar and very different skill sets, and enhance the positive effects of related skills and human capital on productivity.}
+    
+    \emph{2. Strong entrepreneur–sibling relationships (co-occurrence) in the firm will mitigate/ lower the negative effects of similar and very different skill sets and enhance the positive effects of related skills and human capital on productivity.}
+
+    \emph{3. Strong entrepreneur–partner relationships (co-occurrence) in the firm will mitigate/ lower the negative effects of similar and very different skill sets and enhance the positive effects of related skills and human capital on productivity.}
+
+    Dependent variable is log labour productivity.
+    Independent variable is family relations(counts of entrepreneur's children in the same firm), including entrepreneur–children, entrepreneur-partner, entrepreneur-sibling. 
+    Control variables: 
+    
+    \emph{1. SIM, degree of similarity of formal education.}
+
+    \emph{2. REL, relatedness of formal education.}
+
+    \emph{3. UNREL, unrelatedness of formal education. }
+
+    \emph{4. Frim size}
+
+    \emph{5. Higher education: share of workers with a minimum of Bachelor's degree.}
+
+    \emph{6. Capital}
+
+    \emph{7. Regional size: Employment by region}
+
+    \emph{8. Specialization: LQ}
+
+    SIM is proposed by Boschma(2009), 
+    \begin{equation}
+        SIM=\frac{1}{\sum_{i=1}^{N^3}P_i^3log_2[1/P_i^3]}
+    \end{equation}
+    REL can be caculated similarly, 
+    \begin{equation}
+        REL=\sum_{j=1}^{N^2}P_j^2H_j=\sum_{j=1}^{N^2}\sum_{i\in S_i^2}P_i^3\sum_{i=S_i^2}\frac{P_i^3}{P_j^2}\bigg[\frac{1}{P_i^3/P_j^2}\bigg]
+    \end{equation}
+    UNREL is proposed by Frenken(2007),
+    \begin{equation}
+        UNREL=\sum_{l=1}^{N^1}P_i^1log_2[1/P_i^1]
+    \end{equation}
+
+    The model is:
+    \begin{equation}
+        \begin{aligned}
+            lnP_{it}=&\beta_0+\beta_1[Entrepreneur's\; family\; relations_{it-1}]  
+            +\beta_2[Control_{it}]+\\
+            &\beta_3[Entrepreneur's\; family\; relations_{it}\times Skill\; variety_i]
+            +v_i+\epsilon_{it}
+        \end{aligned}
+    \end{equation}
+
+    We can partly confrim Hypothesis 1, family relationships involving entrepreneur-children 
+    abate the negative effects of similarity in formal education (SIM) on productivity. 
+    The significance of the entrepreneur–children variable disappears, which indicates that the 
+    positive and significant estimate of Model 1 and 4 is mainly found in firms where the children have an educational 
+    level similar to that of their parent entrepreneur.
+
+    There is no support for Hypothesis 2, neither the entrepreneur-sibling variable nor any of the interactions are significant in any model. 
+
+    Hypothesis 3 can be partly confirmed, because family relationships involving entrepreneur-partner are positively correlated with related competencies (REL), as well as mitigating the negative impact of similar and unrelated competences.
+    However, t has a somewhat weaker association with productivity than the impact of related skills alone.
+
+\subsection{Founding-Family Ownership and Firm Performance: Evidence from the SP 500}
+    ~\
+
+    The paper explore the relation between founding-family ownership and firm performance in large public firms. 
+    They conduct :
+
+    \emph{1. Time-series cross-sectional comparsion of family and nonfamily firms. }
+
+    \emph{2. Investigating the association between active family control and firm performance. }
+
+    \emph{3. The impact of other large equity blockholders in the presence of family ownership and the discrepency between 
+    family ownership and control rights on firm performance. }
+
+    The paper argue the disadvantages and advantages.
+
+    \emph{Disadvantages}
+
+    \emph{1. The family’s role in selecting managers and directors can also create impediments for third parties in capturing 
+    control of the firm, suggesting greater managerial entrenchment and lower firm values relative to nonfamily firms. }
+
+    \emph{2. Families are also capable of expropriating wealth from the firm through excessive compensation, related-party transactions, or special dividends.
+    They are no longer competent or quali¢ed to run the firm.}
+
+    \emph{3.  Families have incentives to redistribute rents from employees to themselves.}
+
+    \emph{Advantages}
+
+    \emph{1. The family’s wealth is so closely linked to firm welfare, families may have strong incentives 
+    to monitor managers and minimize the freerider problem inherent with small, atomistic shareholders. }
+
+    \emph{2. Firms that have shareholders with longer investment horizons suffer less managerial myopia and are therefore less likely to forgo good investments to boost current earnings.}
+
+    \emph{3. One consequence of families maintaining a long-term presence is that the firm will enjoy a lower cost of debt financing compared to nonfamily firms.}
+
+    The dependent variable is firm performance(ROA based on EBITDA and net income), independent variable
+    is a binary variable that equals one when the founding family is present in the firm, and zero otherwise.
+    control variables:
+    \emph{officer and director holdings less family holdings, unaffiliated blockholdings, fraction of independent directors serving on the board, 
+    fraction of total pay that the CEO receives in equity-based forms, research and development expenses divided by total sales, long-term debt divided by total assets, 
+    stock return volatility, natural log of total assets, and the natural log of firm age;
+    }
+
+    The model is:
+    \begin{equation}
+        \begin{aligned}
+            Firm \; Performance&=\delta_0+\delta_1(Family\; Firm)+\\
+            &\delta_3(control\; variables)+\delta_{3-54}(Two\; digit\; SIC\; Code)+ \\
+            &\delta_{93-99}(Year\; Dummy\; Variables)+\epsilon
+        \end{aligned}
+    \end{equation}
+
+    There are conclusions:
+
+    \emph{1. Younger firms have a greater impact, but both young and old family firms exhibit a significant and positive association to ROA, regardless of firm age.
+    (Tobin's q in family firms is 10.0 percent higher than in nonfamily firms.)}
+
+    \emph{2. Based on accouny=ting performance, family firms appear to be better performers only when a family member serves as CEO.}
+
+    \emph{3. The founder descendants are unrelated to market performance.}
+
+    \emph{4. The relation between firm performance and founding family ownership is nonlinear.}
+
+\subsection{How do family ownership, control and management affect firm value?}
+    ~\
+    
+    This paper try to understand whether and when family firms trade at a premium or discount relative to nonfamily firms.
+    Three questions are solved: 
+
+    \emph{1. Does family ownership per se create or destroy value?}
+
+    \emph{2. Does family control create or destroy value?}
+
+    \emph{3. Does family management create or destroy value?}
+
+    Dependent variable: Tobin's q or Industry-adjusted q
+    
+    Independent variable: Family ownership 
+    
+    Control variable: \emph{Asset, Sales, Employees, Firm age since founding, generation, sales growth,
+    ROA, Control-enhancing mechanisms, Family excess voteholdings, Governance index, Nonfamily blockholdings, Nonfamily outside directors, Dividends/book equity, Debt/market value of equity,
+    Market risk (beta), Idiosyncratic risk, Diversification dummy, R\&D/sales, CAPX/PPE}   
+
+    Conclusions:
+
+    \emph{1. Despite the costs associated with the family's excess control, the benefits 
+    of family ownership make minority shareholders better off than they would have been in
+    a nonfamily firm.}
+
+    \emph{2. The effect of blockholders is significant more negative for nonfamily 
+    firms than it is for family firms, and blockholders are more likely to take control of 
+    underperforming firms, especially those that are not already controlled by a family.}
+    
+    \emph{3. An absence of control-enhancing mechanisms curbs the family’s power to expropriate minority 
+    shareholders and thus reduces the price that families pay for control. }
+
+    \emph{4. If there are multiple share classes and the family’s super-voting shares trade, or are valued, 
+    at a premium relative to the other class, minority shareholders pay a disproportionate share of the price for the founder’s control.
+    The presence of control-enhancing mechanisms is not so much an indication of the desire to expropriate 
+    minority shareholders as it is of family resistance to the dilution of their ownership stake as the firm grows.}
+    
+
+    The results are robust to the use of multivariate regression of $q$ and industry adjusted $q$. 
+\subsection{Mixing family with business: A study of Thai business groups and the families behind them}
+    ~\
+
+    There are three main finding:
+    
+    \emph{1. Documenting in detail how control, managemnet and ownership are allocated 
+    are allocated accross different family members. }
+
+    \emph{2. Showing that families where the founder has a relatively greater number of sons are associated with lower firm-level performance.}
+
+    \emph{3. Families that have relatively more sons tend to show a larger discrepancy between control and ownership rights (excess control.
+    Moreover, sons show higher levels of excess control once the founder is gone. }
+
+    In order to analysis the role of individual family members in the performance and 
+    governmence of group firms, two types of involvement should be focus on: board membership and share ownership.
+    
+    Ownership structure: 
+    
+    \emph{They find a strong positive correlation between the size of the family and the number of family members who are involved in business. }
+
+    Board positions: 
+
+    \emph{1. The involvement of family members on the boards of firms increases with the size of the family, 
+    and there is no significant change in the overall number of board positions when the founder is dead. }
+
+    \emph{2. The fraction of board positions held by the sons is not significantly higher when the founder is dead.
+    And the number of other family members has a negative and significant (albeit small) relation with the fraction of 
+    board positions held by the sons. }
+
+\section{Theory Articles}
+\subsection{Blood and Money: Kin altruism, governance, and inheritance in the family firm}
+    ~\
+
+    Model:
+    
+    \emph{Preferences}
+
+    \begin{equation}
+        u^{Self}=v^{Self}+hv^{Relative}
+    \end{equation}
+
+    \emph{Effort}
+
+    The distribution of cash flow $\tilde{x}$ meet: 
+    \begin{equation}
+        \tilde{x}=dist.\begin{aligned}
+            \begin{cases}
+                \tilde{x},\;&w.p.\;p \\
+                0\;&w.p.\;1-p
+            \end{cases}
+        \end{aligned}
+    \end{equation}
+    Then the non-pecuniary effort cost is $\epsilon(p)$, it is a weakly increasing function of $p$.
+    
+
+    
+
+
+\subsection{Financing from Family and Friends}
+    ~\
+
+    The family finance is cheap, but it comes with shadow costs. The aspects that make informal finance less attractive including 
+    greater risk aversion of informal investors, monitoring costs, social penalties, which imply a preium on required return. 
+
+    The model in this paper account for both negative required returns and shadow costs. It is different
+    from standard moral hazard model of external finance, where an entrepreneur can approcah a family and an outsider.  
+
+    This article mainly discusses two issues: financing under altruism, financing and social debt.
+
+    Altruism is characterized by a joint utility function, and the utility function is piecewise. 
+    \begin{equation}
+        U_E=(1-\phi)u(x_E)+\phi u(x_F)
+    \end{equation}
+    \begin{equation}
+        u(x)=\begin{cases}
+            x& for\; x\leq \underline{x}  \\
+
+            \underline{x}+m(x-\underline{x})& otherwise
+        \end{cases}
+    \end{equation}
+    For the financing problem under altruism, the article mainly carries on according to the familial insurance condition as the main line.
+   
+    \begin{equation}
+        \frac{1}{m}>\frac{1-\phi}{\phi}
+    \end{equation}
+    If the familial insurance condition is violated, then two results can be conducted. 
+    
+    \emph{1. When the entrepreneur is unconstrained, altruism is irrelevant to the financing results.} 
+    
+    The first part reflects that $E$ prefers repaying $F$ rather than $O$ when the project succeeds, 
+    while conversely, the second part reflects that $E$ prefers losing $O$’s rather than $F$’s wealth when the project fails. 
+    Given $R_i = I_i/q$ for $i = F,O$, these components are equivalent. 
+    \begin{equation}
+        \begin{aligned}
+            (1-\phi)\big\{E[u(I_{ext}-I+\tilde{R}-\tilde{R}_{ext})]-
+            E[u(I_{ext}-&I+\tilde{B})]\big\}\ge \\
+            \phi\big\{u(W-I_F-\phi E[u(W-I_F+\tilde{R}_F)])\big\} 
+        \end{aligned}
+    \end{equation}
+
+    \emph{2. When the entrepreneur is risk- or capital-constrained, he prefers to use family finance. If the risk allocation is efficient, the source of funding is irrelevant.}
+
+
+    If altruism is strong enough to satisfy the familial insurance condition, i.e. $\phi$ is high enough, outside finance will be more attractive. 
+
+    \emph{1. When the entrepreneur is unconstrained, though he may be risk-constrained, outside finance dominates family finance. }
+    
+    The article prove that if the familial insurance condition is satisfied and the entrepreneur is capital-unconstrained. Then the entrepreneur prefers outside finance.
+    If 
+    \begin{equation}
+        W-I<2\underline{x}<W-I+R
+    \end{equation}
+    the entrepreneur raises outside finance up to a threshold, but is otherwise indifferent between
+    the financing sources. Both investors demand the same interest rate. The familial insurance condition 
+    implies that $F$, when wealthy, is willing to insure $E$ against low consumption. That provided, constrained insurance condition implies that undertaking the project without outside finance 
+    reduces $F$ ’s capacity to provide such insurance.
+
+    \emph{2. When the entrepreneur is constrained, he prefers to finance from outside. }
+
+    Another problem is social debt and project moral hazard. This part is expanded by the gift exchange condition: 
+    \begin{equation}
+        R_F\leq \frac{a^{+}-a^-}{c-a^+}\frac{\lambda}{1+\lambda}(W-I)
+    \end{equation}
+
+    If optimal financing is without project moral hazard, the condition is satisfied:
+    First, for $c=1$, the interest rate equals the default premium under outside finance. Second, 
+    the interest rate increases with $c$. But due to the lack of a default premium, a loan from $F$ is priced below the interest rate charged by $O$ for all $c$ that satisfy Assumption, that is, all favors that $F$ is willing to accept.
+
+    If optimal financing is with project moral hazard: Suppose the entrepreneur is constrained and the gift exchange condition is satisfied. 
+    There are $\{a^+, a^-, \lambda, c\}$ for which the project is feasible. If the project is feasible, the entrepreneur raises part of the financing from a friend as a donation or as a 
+    loan at a below-market interest rate, and for $c > 1$, the remaining part through outside finance.
+    It implies that a gift exchange is sometimes necessary for the project to be realized. There also exist parameter 
+    constellations for which outside finance is necessary. To see this, consider E and F’s joint expected utility assuming their relationship is unharmed: $U_E + U_F = (1 + a^+) (u_E + u_F )$. In the absence of outside finance, the two friends are jointly better off 
+    from undertaking the project only if
+    \begin{equation}
+        (1 + a^+) [W + qR - I - (1 - q)(c - 1)R_F^{**}]\ge (1 + a^+) W
+    \end{equation}
+
+\end{document}
