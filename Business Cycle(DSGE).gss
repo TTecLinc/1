@@ -1,0 +1,1403 @@
+new;
+clear all;
+library pgraph;
+
+neg=-1e30;
+Macheps=1e-30;
+#include olg1.src;
+#include ch8_toolbox.src;
+graphsettings;
+_plwidth=7;
+
+ptol =MachEps^(1/3);
+
+_MNR_Print=0;
+_MNR_Global=1;
+_MNR_QR=1;
+
+
+cls;
+
+load sp2;
+load efage=ef1;
+
+method=1;           /* computation of the transition with
+                        1) Broyden: method=1
+                        2) tatonnement: method=2
+                    */
+
+firsttime=1;    /* 1 --- computation of initial and final steady state 
+                   2 --- load initial and final steady-state values and compute transition 
+                        at once */
+
+
+@ --------------------------------------------------------------------------------------
+
+paramter values 
+
+-------------------------------------------------------------------------------------- @
+
+
+ntrans=300;     /* number of transition periods */
+nage=75;        /* maximum age */
+lambda0=0.011;  /* initial population rate */
+lambda1=0;    /* final population growth rate */
+nw=45;          /* number of working years */
+gam=0.32;
+qbar=0.018;     /* exogenous growth rate */
+
+/* periods */
+Rage=46;    /* first period of retirement */
+nr=nage-Rage+1; /* number of retirement years */
+nw=Rage-1;     /* number of working years */
+
+/* final goods production */
+alpha=0.35;
+delta=0.08;
+
+if rows(efage)<nw;
+    "year-age profile not long enough"; end;
+endif;
+efage=efage[1:nw];
+/* calibration: Mean efficiency=1 in steady state */
+efage=efage/meanc(efage);
+
+alpha=0.35;
+
+/* preferences */
+sigma=2.0;
+beta1=0.99;
+
+/* households types */
+nj=2;   /* idiosyncratic shock */
+ef=(0.57|1.43);
+
+/* calibration: Mean efficiency=1 in steady state */
+ef1=ef[1]*efage;
+ef2=ef[2]*efage;
+
+/*
+title("efficiency-age profile");
+tw=seqa(20,1,nw);
+xlabel("age");
+ylabel("e(s,j)");
+xy(tw,ef1~ef2);
+wait;
+*/
+
+/* auxiliary variables */
+nvar2=nj*nw;
+nvar1=nj*(nage-1);
+nvar=nvar1+nvar2;
+
+/* government */
+gy=0.195;                /* government share G/Y */
+tauw0=0.248;
+taur0=0.429;
+zeta10=0.5;
+tauw=zeros(nage,1);     /* labor income tax */
+taur=zeros(nage,1);     /* interest income tax */
+taub=zeros(nage,1);     /* pension contribution rate */
+zeta1=zeros(nage,1);     /* pension replacement ratio */
+tr=zeros(nage,1);       /* transfers */
+
+
+/* computational parameters */
+psi1=0.8;            /* updating parameter for the iterative method with dampening */
+/* psi1=0.8 does not converge!!! */
+tolkrit=0.001;    /* tolerance for final divergence of K,N,tr */
+nbiter=20;        /* number of maximum iterations in Broyden algorithm */
+
+/* initialization */
+w=zeros(nage,1);    /* wage vector over life-time */
+r=zeros(nage,1);    /* interest rate over life-time */
+q=zeros(nage,1);    /* growth rate */
+
+
+taubbar=(nage-rage+1)/nw*zeta10;
+taubold=taubbar;
+bigl=0.2;       /* aggregate effective labor supply */
+biga=1.0;
+lbar=0.3;       /* average hourly labor supply */
+lbarold=lbar;
+rbar=0.02;
+kbar=(alpha/(delta+rbar))^(1/(1-alpha));
+"kbar: " kbar;
+wbar=(1-alpha)*kbar^alpha;
+ybar=kbar^(alpha);
+cbar=((1-gy)*ybar-delta*kbar)*2/3*lbar;
+
+
+
+@ --------------------------------------------------------------------------------------------
+
+initialization of solution for k from the model with inelastic labor supply, l=0.3 
+
+------------------------------------------------------------------------------------------- @
+
+/* computation of mass */
+lambda=lambda1;
+mass=ones(nage,1);
+i=1;
+do until i==nage;
+    i=i+1;
+    mass[i]=mass[i-1]*sp2[i]/(1+lambda);
+endo;
+mass=mass/sumc(mass);
+ns=0.3;
+zeta11=zeta10*ns; /* replacement ratio: constant fraction of wage rate */
+
+if firsttime==1;
+    k0=5.0;
+    trs=0.1;
+    x1=k0|trs;
+    bounds=(0.0001~1000|
+           -5.9~5.0);
+
+    {xf,crit}=FixVMN1(x1,&getk);
+    "crit: " crit;
+    "xf: " xf; 
+
+    kold=xf[1];
+    trold=xf[2];
+    factor=seqm(1,1+qbar,nage);
+    load kvec,cvec,theta;
+
+
+    kvec1=kvec|(0~0);
+    kvec1=kvec1.*factor;
+    cvec=cvec.*factor;
+    tt=seqa(20,1,nage);
+
+@ --------------------------------------------------------------------------------
+
+computation of the final steady state
+
+---------------------------------------------------------------------------------- @
+
+    biglold=ns*sumc(mass[1:nw]);
+    nvec=ns*ones(nw,nj);
+    kn=kold/biglold;
+    k0=reshape(kvec,nvar1,1);
+    n0=ones(nvar2,1)*ns;
+    x0=k0|n0;
+
+    trbar=trold;
+    taubbar=theta;
+    bigl=biglold;
+    kbar=kold;
+    rbar=alpha*kn^(alpha-1)-delta;
+    wbar=(1-alpha)*kn^alpha;  
+    pennew=zeros(2,1);
+    j=0;
+    do until j==2;
+        j=j+1;
+        pennew[j]=zeta11*(1-tauw0-taubbar)*wbar*ef[j];
+    endo;
+
+
+    "computation of the steady state with inelastic labor supply ns=0.3 "; 
+
+    /* transfers and contribution rate etc over the life-time */
+    tr=ones(nage,1)*trbar;
+    taub=ones(nage,1)*taubbar;
+    zeta1=ones(nage,1)*zeta11;
+    w=ones(nage,1)*wbar;
+    r=ones(nage,1)*rbar;
+    
+    k0=reshape(kvec,nvar1,1);
+    n0=reshape(nvec,nvar2,1);
+    x0=k0|n0;
+
+
+    /* bounds on capital stock and labor supply */
+    bounds=zeros(nvar,2);
+    bounds[1:nvar1,1]=ones(nvar1,1).*(-1.0);
+    bounds[nvar1+1:nvar,1]=ones(nvar2,1).*0.00001;
+    bounds[1:nvar1,2]=ones(nvar1,1).*100;
+    bounds[nvar1+1:nvar,2]=ones(nvar2,1).*0.98;
+
+    /* solves the model with inelastic labor supply */
+    {crit,x}=FixvMN(x0,bounds,&Sys1a);
+    if maxc(crit)>1e-4; "no steady state solution"; endif;
+    kvec=x[1:nvar1];
+    nvec=x[nvar1+1:nvar];
+    kvec=reshape(kvec,nage-1,nj);
+    nvec=reshape(nvec,nw,nj);
+
+
+    ssold=kold|biglold|trold;    
+    bounds1=(0~10|
+        0~1|
+        -5~5);
+
+    "final steady state computation"; wait; cls;
+    bsec=hsec;
+    {crit,xf}=FixVMN(ssold,bounds1,&getss);
+
+    "complete";
+    "crit: " maxc(abs(crit));
+    ?etstr(hsec-bsec);  wait; cls;
+    ssnew=xf;
+
+
+    kfinal=xf[1];
+    biglfinal=xf[2];
+    trfinal=xf[3];
+    wait;
+
+    kvecfinal=kvec;
+    nvecfinal=nvec;
+    wfinal=w;
+    zeta1final=zeta11;
+    taubfinal=taub[1];
+    rfinal=r;
+    qfinal=q;
+
+    load beq;
+    save beqfinal=beq;
+    save kfinal,biglfinal,trfinal,taubfinal;
+    save kvecfinal, nvecfinal;
+    save wfinal,zeta1final,rfinal;
+
+
+    k0=reshape(kvec,nvar1,1);
+    n0=reshape(nvec,nvar2,1);
+    x0=k0|n0;
+
+    dffinal=CDJac(&getss,xf,3);
+    "dffinal: ";
+    dffinal;
+    wait;
+
+    save dffinal;
+
+    load cvec;    
+    tt1=seqa(20,1,nage-1);
+    tt2=seqa(20,1,nw);
+    tt3=seqa(20,1,nage);
+    title("capital stock - final steady state");
+    xy(tt1,kvec);
+    wait;
+    title("labor supply - final steady state");
+    xy(tt2,nvec);
+    wait;
+    title("consumption - final steady state");
+    xy(tt3,cvec);
+    wait;
+    cvecfinal=cvec;
+    save cvecfinal;
+
+
+@ ---------------------------------------------------------------------------------------
+
+computation of the initial steady state
+
+--------------------------------------------------------------------------------------- @
+
+    /* computation of mass */
+    lambda=lambda0;
+    mass=ones(nage,1);
+    i=1;
+    do until i==nage;
+        i=i+1;
+        mass[i]=mass[i-1]*sp2[i]/(1+lambda);
+    endo;
+    mass=mass/sumc(mass);
+    "lambda: " lambda;
+    "computation of initial steady state with elastic labor supply "; 
+    wait;
+
+    bsec=hsec;
+    {crit,xf}=FixVMN(ssnew,bounds1,&getss);
+    ?etstr(hsec-bsec);  
+    "complete";
+    "crit: " maxc(abs(crit));
+    ssnew=xf;
+    wait;
+
+
+    kinitial=xf[1];
+    biglinitial=xf[2];
+    trinitial=xf[3];
+    taubinitial=taub[1];
+
+    save kinitial, biglinitial, trinitial, taubinitial;
+
+
+    winitial=w;
+    zeta1initial=zeta1;
+    rinitial=r;
+    qinitial=q;
+
+    save winitial,zeta1initial,rinitial;
+
+    kvecinitial=kvec;
+    nvecinitial=nvec;
+    save kvecinitial,nvecinitial;
+
+    dfinitial=CDJac(&getss,xf,3);
+    "dfinitial: ";
+    dfinitial;
+    wait;
+
+    save dfinitial;
+
+    load cvec;
+    tt1=seqa(20,1,nage-1);
+    tt2=seqa(20,1,nw);
+    tt3=seqa(20,1,nage);
+    title("capital stock");
+    xy(tt1,kvec);
+    wait;
+    title("labor supply");
+    xy(tt2,nvec);
+    wait;
+    title("consumption");
+    xy(tt3,cvec);
+    wait;
+
+    "initial ~final values: ";
+    "k: " kinitial~kfinal;
+    "L: " biglinitial~biglfinal;
+    "tr: " trinitial~trfinal;
+    "taub: " taubinitial~taubfinal;
+    cvecinitial=cvec;
+    save cvecinitial;
+
+
+    "Figure 9.13: " wait;
+    
+    begwind;
+    window(2,2,0);
+    _plctrl=0;
+    _plegctl=0;
+    /* _plegctl={40 0.002 0.1 0.7}; */
+    _pltype=6|1;
+    /* _plegstr="constant population\000growing population"; */
+    title("savings of the low-productivity agents");
+    xlabel("age");
+    ylabel("");
+    xy(seqa(21,1,74),kvecfinal[.,1]~kvecinitial[.,1]);
+    nextwind;
+    title("labor supply of the low-productivity worker");
+    xlabel("age");
+    xy(seqa(20,1,45),nvecfinal[.,1]~nvecinitial[.,1]);
+    nextwind;
+    title("savings of the high-productivity agents");
+    xlabel("age");
+    xy(seqa(21,1,74),kvecfinal[.,2]~kvecinitial[.,2]);
+    nextwind;
+    title("labor supply of the high-productivity worker");
+    xlabel("age");
+    xy(seqa(20,1,45),nvecfinal[.,2]~nvecinitial[.,2]);
+    endwind;
+    wait;
+    GraphSettings;
+else;
+
+
+    load kinitial, biglinitial, trinitial, taubinitial;
+    load kvecinitial,cvecinitial;
+    load nvecinitial;
+    load dfinitial;
+
+
+    load kfinal,biglfinal,trfinal,taubfinal;
+    load kvecfinal, nvecfinal,cvecfinal;
+    load dffinal;
+
+    load winitial,zeta1initial,rinitial;
+    load wfinal,zeta1final,trfinal,taubfinal,rfinal;
+
+
+endif;
+
+@ -----------------------------------------------------------------------------
+
+initialization of k, l , tr, taub for the transition
+
+------------------------------------------------------------------------------ @
+
+
+kntold=zeros(ntrans,1);
+ktold=zeros(ntrans,1);
+bigltold=zeros(ntrans,1);
+trtold=zeros(ntrans,1);
+taubtold=zeros(ntrans,1);
+
+x=seqa(0,1,ntrans);
+ktold=kinitial+(kfinal-kinitial)/(ntrans-1)*x;
+bigltold=biglinitial+(biglfinal-biglinitial)/(ntrans-1)*x;
+trtold=trinitial+(trfinal-trinitial)/(ntrans-1)*x;
+
+
+taubtold=taubinitial+(taubfinal-taubinitial)/(ntrans-1)*x;
+kntold=ktold./bigltold;
+
+
+title("initial guess: transition of k/n");
+ylabel("time");
+xy(seqa(1,1,ntrans),kntold);
+wait;
+
+kvec=kvecfinal;
+nvec=nvecfinal;
+cvec=cvecfinal;
+
+@ --------------------------------------------------------------------------
+
+computation of the new population mass
+
+--------------------------------------------------------------------------- @
+
+
+/* computation of mass */
+/* assumption: in period t=0, mass of population=1, stationary distribution */
+lambda=lambda0;
+mass=zeros(nage,ntrans);
+mass[1,1]=1;
+i=1;
+do until i==nage;
+    i=i+1;
+    mass[i,1]=mass[i-1,1]*sp2[i]/(1+lambda);
+endo;
+mass[.,1]=mass[.,1]/sumc(mass[.,1]);
+
+
+"Figure 9.8: " wait;
+Graphsettings;
+title("");
+xlabel("Age");
+ylabel("");
+xy(seqa(20,1,nage),mass[.,1]);
+wait;
+
+
+lambda=lambda1;
+pmass=zeros(ntrans,1);  /* mass of total population in period pt */
+lmass=zeros(ntrans,1);  /* mass of working age population in period pt */
+pmass[1]=sumc(mass[.,1]);
+lmass[1]=sumc(mass[1:nw,1]);
+pt=1;
+do until pt==ntrans;
+    pt=pt+1;
+    mass[1,pt]=mass[1,pt-1]*(1+lambda);
+    i=1;
+    do until i==nage;
+        i=i+1;
+        mass[i,pt]=mass[i-1,pt-1]*sp2[i];
+    endo;
+    pmass[pt]=sumc(mass[.,pt]);
+    lmass[pt]=sumc(mass[1:nw,pt]);
+endo;
+
+graphsettings;
+"Figure 9.9: " wait;
+ylabel("Population size");
+xlabel("Period");
+title("");
+xy(seqa(1,1,ntrans),pmass);
+wait;    
+
+"Figure 9.10: " wait;
+ylabel("Labor force share");
+xlabel("Period");
+title("");
+xy(seqa(1,1,ntrans),lmass./pmass);
+wait;    
+
+
+
+
+@ --------------------------------------------------------------------------
+
+Computation of the transition dynamics: Broyden Algorithm
+
+------------------------------------------------------------------------- @
+
+/* method 1 */
+
+if method==1;
+cls;
+"method of computation: Broyden";
+wait;
+
+
+/* initialization of the Broyden matrix */
+broy=diag(dffinal).*eye(3);
+broy=broy.*.eye(ntrans);
+broyold=broy;
+broyinv=inv(broy);
+if maxc(abs(diag(broyinv)))>1;
+    maxc(abs(diag(broyinv))); wait;
+    broyinv=broyinv/(1.1*maxc(abs(diag(broyinv))));
+    broy=inv(broyinv);
+endif;
+
+transsec=hsec;
+
+xold=ktold|bigltold|trtold;
+yold=gettrans(xold);
+fold=1/2*yold'*yold;
+"fold: " fold;
+krit1=1+tolkrit;
+biter=0;
+do until biter==nbiter or krit1<tolkrit;   
+    biter=biter+1;
+    krit=0;
+    "biter: " biter;
+    "krit1: " krit1;
+    dx=-broyinv*yold;
+    xold1=xold+dx;
+    y1=gettrans(xold1); 
+    f1=1/2*y1'*y1;
+    krit1=f1;
+    "f1~fold: " f1~fold;
+    if f1<fold;
+        krit=1;
+    else;
+        dg=yold'*broy;
+        step2=GetStep2(xold,dx,dg,&gettrans); 
+        xold1=xold+step2*dx;
+        y1=gettrans(xold1); 
+        f1=1/2*y1'*y1;
+        krit1=f1;
+        if f1<fold;
+            krit=1;
+        else;
+            krit=0;
+        endif;
+        "line search";
+        "f1~fold: " f1~fold;
+    endif;
+
+    /* update of Broyden */
+    if krit==1;
+        s=xold1-xold;
+        w=(y1-yold)-broy*s;
+        broy=broy+w*s'/(s'*s);
+        broyinv=inv(broy);
+        if maxc(abs(diag(broyinv)))>1;
+            broyinv=broyinv/(1.1*maxc(abs(diag(broyinv))));
+            broy=inv(broyinv);
+        endif;
+        xold=xold1;
+        fold=f1;
+        yold=y1;
+    elseif krit==0;
+        broy=broyold;
+    endif;
+    "krit: " krit;
+
+    if biter<3 or (biter==round(biter/4)*4);
+        wait;
+    endif;
+
+endo;
+
+"running time of Broyden: ";
+    ?etstr(hsec-transsec);  wait;
+    "maxc(abs(y1)): "     maxc(abs(y1)); 
+ 
+
+
+@ --------------------------------------------------------------------------
+
+Computation of the transition dynamics: update with dampening
+
+------------------------------------------------------------------------- @
+
+elseif method==2;
+/* method 2 */
+cls;
+"Second method of computation: iterative update with dampening";
+wait;
+
+
+xold=ktold|bigltold|trtold;
+xnew=zeros(3*ntrans,1);
+transsec=hsec;
+xold1=xold;
+
+krit1=1+tolkrit;
+kritold=1e10;
+
+biter=0;
+do until biter==nbiter or krit1<tolkrit;   
+    biter=biter+1;
+    {xnew[1:ntrans],xnew[ntrans+1:2*ntrans],xnew[2*ntrans+1:3*ntrans]}=getvaluetrans(xold[1:ntrans],xold[ntrans+1:2*ntrans],xold[2*ntrans+1:3*ntrans]);
+    krit1=1/2*(xnew-xold)'*(xnew-xold);
+    "biter~krit1: " biter~krit1; 
+    if biter==round(biter/4)*4;
+        wait;
+    endif;
+    if krit1<kritold;   /* did we get closer to the solution? */
+        xold1=xold;
+        kritold=krit1;
+        xold=psi1*xold+(1-psi1)*xnew;
+    else;               
+        xold=psi1*xold1+(1-psi1)*xold;
+    endif;
+endo;
+
+"running time of tatonnement: ";
+?etstr(hsec-transsec);  wait;
+    "maxc(abs(xnew-xold)): "     maxc(abs(xnew-xold)); wait;
+
+endif;
+
+
+kt=xold[1:ntrans];
+biglt=xold[ntrans+1:2*ntrans];
+trt=xold[2*ntrans+1:3*ntrans];
+knt=kt./biglt;
+rt=alpha*knt.^(alpha-1)-delta;
+wt=(1-alpha)*knt.^alpha;  
+
+/* computation of taub in period pt=1,..,ntrans */
+taubt=zeros(ntrans,1);
+pt=0;
+do until pt==ntrans;
+    pt=pt+1;
+    taubt[pt]=(1-tauw0)*zeta11*sumc(mass[Rage:nage,pt]/pmass[pt])/(biglt[pt]+zeta11*sumc(mass[Rage:nage,pt])/pmass[pt]);
+endo;        
+
+GraphSettings;
+_plwidth=7;
+_ptitlht=0.4;
+begwind;
+window(3,2,0);
+title("capital stock per capita");
+xy(seqa(1,1,ntrans),kt);
+nextwind;
+title("effective labor supply");
+xy(seqa(1,1,ntrans),biglt);
+nextwind;
+title("government transfers per capita");
+xy(seqa(1,1,ntrans),trt);
+nextwind;
+title("social security contribution rate");
+xy(seqa(1,1,ntrans),taubt);
+nextwind;
+title("wage rate");
+xy(seqa(1,1,ntrans),wt);
+nextwind;
+title("interest rate r");
+xy(seqa(1,1,ntrans),rt);
+endwind;
+
+save kt,biglt,trt,taubt,wt,rt,ntrans;
+
+@ --------------------------  PROCEDURES ---------------------------------- @
+
+
+proc uc(x,y);
+    retp( gam*x^(gam*(1-sigma)-1).*y^((1-gam)*(1-sigma))  );
+endp;
+
+proc ul(x,y);
+    retp( (1-gam)*x^(gam*(1-sigma)).*y^((1-gam)*(1-sigma)-1) );
+endp;
+
+
+proc utility(x,y);
+    retp( (x^(gam*(1-sigma)).*y^((1-gam)*(1-sigma)) ) / (1-sigma) );
+endp;
+
+
+proc(1)=GetK(x); @ the zero of this function is the stationary stock of capital in the model 
+                    with exogenous labor supply @
+
+   local k,trs,fx,ys,gs,ws,rs,krate,pens,theta,ds,ds1,dvec,kvec;
+   local j,i,amat,f1,f2,dvec0,kvec0,k0,beq,gtr,cvec, ls;
+
+    "x: " x';
+   k=x[1];
+   trs=x[2];
+   fx=x;
+   ls=ns*sumc(mass[1:nw]); 
+   ys=(ls^(1.-alpha))*(k^alpha);
+   gs=gy*ys;                                 
+   ws=(1.-alpha)*(ls^(-alpha))*(k^alpha);
+   rs=alpha*(ls^(1.-alpha))*(k^(alpha-1.))-delta;
+    "w in getk: " ws;
+   krate=(1+(1-taur0)*rs);
+
+   theta=(1-tauw0)*zeta10*ns*sumc(mass[nr:nage])/(ls+zeta10*ns*sumc(mass[nr:nage]));
+
+   pens=(1-tauw0-theta)*ws*ef*ns*zeta10;                 @ pensions per generation are the fraction rep of average net wage income @
+    "pen in getk: " pens;
+   ds=(beta1.*sp2[1:nage-1].*(1+(1-taur0)*rs))^(1/(gam*(1-sigma)-1))*(1+qbar);
+   ds1=(1-ns)^((1-gam)*(1-sigma));
+   ds[nw]=ds[nw]*(1/ds1)^(1/(gam*(1-sigma)-1)); /* at age nw+1, the labor supply decreases from ns to 0 */
+   dvec=zeros(nage-1,nj);
+   kvec=dvec;
+   cvec=zeros(nage,nj);
+   j=0;
+   do until j==nj;
+        j=j+1;
+        i=1;
+        do until i>(nw-1);
+            dvec[i,j]=(1-tauw0-theta)*ef[j]*ws*ns*(efage[i]-ds[i]*efage[i+1])+trs*(1.-ds[i]);
+            i=i+1; 
+        endo;
+   endo;
+    
+   j=0;
+   do until j==nj;
+        j=j+1;
+        dvec[i,j]=(1.-ds[i])*trs+(1.-tauw0-theta)*ws*ns*ef[j]*efage[i]-ds[i]*pens[j];
+   endo;
+   i=i+1;
+   do until i>(nage-1);
+        j=0;
+        do until j==nj;
+            j=j+1;
+            dvec[i,j]=(1.-ds[i])*(pens[j]+trs);
+        endo;
+        i=i+1;
+    endo;
+
+
+    j=0;
+    do until j==nj;
+        j=j+1;
+        amat=zeros(nage-1,nage-1);
+        f1=-krate;
+        f2=1+qbar+ds.*krate; 
+        amat[1,1]=f2[1]; amat[1,2]=-ds[1]*(1+qbar);
+        i=2;
+        do until i>(nage-2);
+            amat[i,i] =f2[i];
+            amat[i,i+1]=-ds[i]*(1+qbar);
+            amat[i,i-1]=f1;
+            i=i+1;
+        endo;
+        amat[nage-1,nage-2]=f1;
+        amat[nage-1,nage-1]=f2[nage-1];
+
+        save amat;
+
+        dvec0=dvec[.,j];
+        kvec0=LSolve(amat,dvec0);
+        kvec[.,j]=kvec0;
+    endo;
+
+        save kvec,theta;
+
+    k0=0;
+    beq=0;
+    i=0;
+    do until i==nage-2;
+        i=i+1;
+        j=0;
+        do until j==nj;
+            j=j+1;
+            beq=beq+(1-sp2[i])*kvec[i,j]*mass[i+1]/nj;
+            k0=k0+kvec[i,j]*mass[i+1]/nj;
+        endo;
+    endo;
+
+    
+    i=1;
+    j=0;
+    do until j==nj;
+        j=j+1;
+        cvec[i,j]=(1-tauw0-theta)*ef[j]*ws*efage[i]*ns+trs-kvec[i,j]*(1+qbar);
+    endo;
+    do until i==nw;
+        i=i+1;
+        j=0;
+        do until j==nj;
+            j=j+1;
+            cvec[i,j]=(1-tauw0-theta)*ef[j]*ws*efage[i]*ns+trs+kvec[i-1,j]*krate-kvec[i,j]*(1+qbar);
+        endo;
+    endo;
+    do until i==nage-1;
+        i=i+1;
+        j=0;
+        do until j==nj;
+            j=j+1;
+            cvec[i,j]=pens[j]+trs+kvec[i-1,j]*krate-kvec[i,j]*(1+qbar);
+        endo;
+    endo;
+        j=0;
+        do until j==nj;
+            j=j+1;
+            cvec[nage,j]=pens[j]+trs+kvec[nage-1,j]*krate;
+        endo;
+
+    save cvec,ds;
+    save amat,dvec0;
+    gtr=beq+tauw0*(1-alpha)*ys+taur0*rs*k-gs;
+    "fx: " fx;
+    fx[1]=k0-k;
+    "trs: " trs;
+    "gtr: " gtr;
+    fx[2]=trs-gtr;
+  retp(fx);
+
+endp;
+
+
+proc(3)=getvaluess(kbar,bigl,trbar);
+    local rbar,bounds,wbar,pennew,k0,n0,x0,crit,x;
+    local cvec, tt1,tt2,tt3,biganew,biglnew,beq,knew,qnew,ybar,totaltax,trnew;
+    local taubnew,eflvec,j,temp,bsec1,knbar,x1;
+
+    "kbar~bigl~trbar: " kbar~bigl~trbar; 
+    
+    kn=kbar/bigl;
+    rbar=alpha*kn^(alpha-1)-delta;
+    wbar=(1-alpha)*kn^alpha;  
+    taubbar=(1-tauw0)*zeta11*sumc(mass[Rage:nage])/(bigl+zeta11*sumc(mass[Rage:nage]));
+
+    pennew=zeros(2,1);
+    j=0;
+    do until j==2;
+        j=j+1;
+        pennew[j]=zeta11*(1-tauw0-taubbar)*wbar*ef[j];
+    endo;
+
+    tr=ones(nage,1)*trbar;
+    taub=ones(nage,1)*taubbar;
+
+    zeta1=ones(nage,1)*zeta11;
+    w=ones(nage,1)*wbar;
+    r=ones(nage,1)*rbar;
+    q=ones(nage,1)*qbar;
+
+    
+    k0=reshape(kvec,nvar1,1);
+    n0=reshape(nvec,nvar2,1);
+    x0=k0|n0;
+
+
+    /* bounds on capital stock and labor supply */
+    bounds=zeros(nvar,2);
+    bounds[1:nvar1,1]=ones(nvar1,1).*(-1.0);
+    bounds[nvar1+1:nvar,1]=ones(nvar2,1).*0.00001;
+    bounds[1:nvar1,2]=ones(nvar1,1).*100;
+    bounds[nvar1+1:nvar,2]=ones(nvar2,1).*0.98;
+
+    bsec1=hsec; 
+    {x,crit}=FixvMN1(x0,&Sys1);
+    ?etstr(hsec-bsec1);  
+    x1=maxc(abs(Sys1(x)));
+    if x1>1e-4; "no steady state solution"; "maxc(crit): " maxc(crit); endif;
+        
+    kvec=x[1:nvar1];
+    nvec=x[nvar1+1:nvar];
+    kvec=reshape(kvec,nage-1,nj);
+    nvec=reshape(nvec,nw,nj);
+
+    /* aggregation */
+    biganew=0;
+    biglnew=0;
+
+
+    beq=0;
+    j=0;
+    do until j==nj;
+        j=j+1;
+        biganew=biganew+(0|kvec[.,j])'*mass/nj;
+        eflvec=ef[j]*nvec[.,j].*efage;
+        biglnew=biglnew+eflvec'*mass[1:nw]/nj;
+        temp=(1-sp2[2:nage]).*mass[1:nage-1];
+        temp=temp/nj*1/(1+lambda);
+        temp=temp'*kvec[.,j];
+        beq=beq+(1+qbar)*(1+(1-taur0)*rbar)*temp;
+    endo;
+
+
+    knbar=biganew/biglnew;
+    wbar=(1-alpha)*knbar^alpha;  
+    knew=knbar*biglnew;
+    ybar=knew^alpha*biglnew^(1-alpha);
+
+    totaltax=tauw0*wbar*biglnew+taur0*rbar*biganew;
+    trnew=totaltax+beq-gy*ybar;
+
+    "knew: " knew~kbar;
+    "biglnew: " biglnew~bigl;
+    "trnew: " trnew;
+    "trbar: " trbar;
+    "taub: " taubbar; 
+    "beq: " beq;
+    "totaltax: " totaltax;
+    "G: " gy*ybar; 
+    save beq;
+    retp(knew,biglnew,trnew);
+endp;
+    
+
+/* solves the individual optimization problem */
+proc Sys1(x);
+    local avec, nvec, rf,fx,j,i,a0,a1,c0,factor,cvec;
+    avec=x[1:nvar1];
+    nvec=x[nvar1+1:nvar];
+    avec=reshape(avec,nage-1,nj);
+    nvec=reshape(nvec,nw,nj);
+    rf=zeros(nage,nj);
+    cvec=rf;
+
+    fx=x;
+    j=0;
+    do until j==nj;
+    j=j+1;
+    i=0;
+    do until i==nage;
+        i=i+1;
+        if i==1;
+            a0=0;
+        else;
+            a0=avec[i-1,j];    
+        endif;
+
+        if i==nage;
+            a1=0;
+        else;
+            a1=avec[i,j];
+        endif;
+        
+        if i>nw;
+            c0=zeta1[i]*(1-tauw0-taub[i])*w[i]*ef[j]+(1+(1-taur0)*r[i])*a0;
+            c0=c0+tr[i]-a1*(1+qbar);    
+            rf[i,j]=uc(c0,1);
+            cvec[i,j]=c0;
+        else;
+            c0=(1-tauw0-taub[i])*nvec[i,j]*w[i]*ef[j]*efage[i]+(1+(1-taur0)*r[i])*a0;
+            c0=c0+tr[i]-a1*(1+qbar);
+            rf[i,j]=uc(c0,1-nvec[i,j]);
+            cvec[i,j]=c0;
+/* first-order condition leisure */
+            fx[nvar1+(j-1)*nw+i]=ul(c0,1-nvec[i,j])-(1-tauw0-taub[i])*w[i]*ef[j]*efage[i];
+     fx[nvar1+(j-1)*nw+i]=(1-gam)/gam*c0-(1-tauw0-taub[i])*w[i]*ef[j]*efage[i]*(1-nvec[i,j]);
+        endif;
+        endo;
+    endo;
+
+    j=0;
+    do until j==nj;
+        j=j+1;
+        i=0;
+        do until i==nage-1;
+            i=i+1;
+            /* intertemporal first-order condition */    
+            factor=beta1*(1+qbar)^(gam*(1-sigma)-1)*sp2[i+1]*(1+(1-taur0)*r[i+1]);
+            fx[(j-1)*(nage-1)+i]=rf[i,j]-factor*rf[i+1,j];
+        endo;
+    endo;
+
+    save cvec,avec,nvec;
+    retp(fx);
+endp;
+
+/* solves the individual optimization problem with n=ns */
+proc Sys1a(x);
+    local avec, nvec, rf,fx,j,i,a0,a1,c0,factor,cvec;
+   
+    avec=x[1:nvar1];
+    nvec=x[nvar1+1:nvar];
+    avec=reshape(avec,nage-1,nj);
+    nvec=reshape(nvec,nw,nj);
+    rf=zeros(nage,nj);
+    cvec=rf;
+
+    fx=x;
+
+    j=0;
+    do until j==nj;
+    j=j+1;
+    i=0;
+    do until i==nage;
+        i=i+1;
+        if i==1;
+            a0=0;
+        else;
+            a0=avec[i-1,j];    
+        endif;
+
+        if i==nage;
+            a1=0;
+        else;
+            a1=avec[i,j];
+        endif;
+        
+        if i>nw;
+            c0=zeta1[i]*(1-tauw0-taub[i])*w[i]*ef[j]+(1+(1-taur0)*r[i])*a0;
+            c0=c0+tr[i]-a1*(1+qbar);    
+            rf[i,j]=uc(c0,1);
+            cvec[i,j]=c0;
+        else;
+            c0=(1-tauw0-taub[i])*nvec[i,j]*w[i]*ef[j]*efage[i]+(1+(1-taur0)*r[i])*a0;
+            c0=c0+tr[i]-a1*(1+qbar);
+            rf[i,j]=uc(c0,1-nvec[i,j]);
+            cvec[i,j]=c0;
+/* first-order condition leisure */
+            fx[nvar1+(j-1)*nw+i]=nvec[i,j]-ns;
+        endif;
+        endo;
+    endo;
+
+    j=0;
+    do until j==nj;
+        j=j+1;
+        i=0;
+        do until i==nage-1;
+            i=i+1;
+            /* intertemporal first-order condition */    
+            factor=beta1*(1+qbar)^(gam*(1-sigma)-1)*sp2[i+1]*(1+(1-taur0)*r[i+1]);
+            fx[(j-1)*(nage-1)+i]=rf[i,j]-factor*rf[i+1,j];
+        endo;
+    endo;
+
+    save cvec,avec,nvec;
+    retp(fx);
+endp;
+
+proc getss(x);
+    local y,y1,y2,y3;
+    y=x;
+    "x: " x';
+    {y1,y2,y3}=getvaluess(x[1],x[2],x[3]);
+    y[1]=y1-x[1];
+    y[2]=y2-x[2];
+    y[3]=y3-x[3];
+    "y: " y';
+    retp(y);
+endp;
+
+
+proc(2)=broyden(&f,b0,x0);
+    local y1,tol,maxit,iter,d,x1,y0,u,ny;
+    local f:proc;
+    y1=f(x0);
+    tol=1e-5;
+    maxit=100;
+    iter=0;
+    do until iter==maxit;
+        iter=iter+1;
+        if abs(y1)<tol;
+            retp(x0,y1);
+        endif;
+        d=-(b0*y1);
+        
+        x1=x0+d;
+        y0=y1;
+        y1=f(x1);
+        u=b0*(y1-y0);
+        b0=b0+((d-u)*(d'*b0))/(d'*u);
+        x0=x1;
+    endo;
+    ny=rows(x1);
+    retp(x1,y1);
+endp;
+
+
+/* solution is optimal transition path for K,N,tr 
+    x1 -- K
+    x2 -- N
+    x3 -- tr
+*/
+proc gettrans(x);
+    local y1,y2,y3,x1,x2,x3;
+    y1=zeros(ntrans,1);
+    y2=zeros(ntrans,1);
+    y3=zeros(ntrans,1);
+    x1=x[1:ntrans];
+    x2=x[ntrans+1:2*ntrans];
+    x3=x[2*ntrans+1:3*ntrans];
+    {y1,y2,y3}=getvaluetrans(x1,x2,x3);
+/*
+    maxc(abs(y1-x1|y2-x2|y3-x3|y4-x4));
+*/
+    retp(y1-x1|y2-x2|y3-x3);
+endp;
+
+
+/* computes the transition for given sequence of K,N,tr over the ntrans periods 
+    - starts in the last period pt=ntrans, ntrans-1, ntrans-2
+    - computes the optimal policy function of an agent born in period pt
+        and updates aggregate savings and labor supply 
+
+        kt -- aggregate capital stock per capita (average capital stock)
+        biglt --- aggregate labor per capita
+        trt --- transfers per capita 
+
+        (all in efficiency units, divided by A_t  */
+
+proc(3)=getvaluetrans(kt,biglt,trt);
+    local at,beqt,taxt,waget,pent,ct,taubt;
+    local rt,testmass,knt,bounds,wt,bigltnew,trtnew,ktnew;
+    local pt,nx, bsec1, mass0, totalmass, c0, w0, a1, pen0, a0;
+    local kntnew, rtnew, wtnew, jk,b0,avec;    
+    local utilt,factor1,it;
+
+/* time series of aggregate variables */
+    at=zeros(ntrans,1);
+    beqt=zeros(ntrans+1,1);
+    taxt=zeros(ntrans,1);
+    waget=zeros(ntrans,1);
+    taubt=zeros(ntrans,1);
+    pent=zeros(ntrans,1);
+    ct=zeros(ntrans,1);
+    rt=zeros(ntrans,1);
+    ktnew=zeros(ntrans,1);
+    bigltnew=zeros(ntrans,1);
+    trtnew=zeros(ntrans,1);
+    utilt=zeros(ntrans,2);  /* average welfare of new born generation */
+    testmass=zeros(ntrans,1);    
+
+    knt=kt./biglt;
+    rt=alpha*knt.^(alpha-1)-delta;
+    wt=(1-alpha)*knt.^alpha;  
+
+
+    /* computation of taub in period pt=1,..,ntrans */
+    taubt[1]=taubinitial;
+    taubt[ntrans]=taubfinal;
+    pt=1;
+    do until pt==ntrans-1;
+        pt=pt+1;
+        taubt[pt]=(1-tauw0)*zeta11*sumc(mass[Rage:nage,pt]/pmass[pt])/(biglt[pt]+zeta11*sumc(mass[Rage:nage,pt])/pmass[pt]);
+    endo;        
+
+    x=seqa(0,0,nage)|seqa(0,1,ntrans-nage);
+    taubt=taubinitial+(taubfinal-taubinitial)/(ntrans-nage-1)*x;
+
+    /* bounds on capital stock and labor supply */
+    bounds=zeros(nvar,2);
+    bounds[1:nvar1,1]=ones(nvar1,1).*(-1.0);
+    bounds[nvar1+1:nvar,1]=ones(nvar2,1).*0.00001;
+    bounds[1:nvar1,2]=ones(nvar1,1).*100;
+    bounds[nvar1+1:nvar,2]=ones(nvar2,1).*0.98;
+    q=ones(nage,1)*qbar;    /* growth rate */
+    
+    pt=ntrans+1;
+    do until pt==-nage+2;
+        pt=pt-1;
+    /* computation of the household problem for the household that is born in period pt */
+    
+        /* prices for the period pt */
+        w=zeros(nage,1);    /* wage vector over life-time */
+        r=zeros(nage,1);    /* interest rate over life-time */
+        zeta1=zeros(nage,1);     /* pension replacement ratio */
+        taub=zeros(nage,1);
+        tr=zeros(nage,1);       /* transfers */
+        zeta1=ones(nage,1)*zeta11;
+
+
+/* computation of the factor price sequence starting in period pt and finishing in period
+    pt+nage-1 */
+
+        if pt>ntrans-nage+1;
+            nx=nage-(ntrans-pt)-1;
+            tr=trt[pt:ntrans]|ones(nx,1)*trt[ntrans];
+            w=wt[pt:ntrans]|ones(nx,1)*wt[ntrans];
+            r=rt[pt:ntrans]|ones(nx,1)*rt[ntrans];
+            taub=taubt[pt:ntrans]|ones(nx,1)*taubt[ntrans];
+
+        elseif pt<1;
+
+            nx=1-pt;
+            tr=ones(nx,1)*trt[1]|trt[1:nage+pt-1];
+            w=ones(nx,1)*wt[1]|wt[1:nage+pt-1];
+            r=ones(nx,1)*rt[1]|rt[1:nage+pt-1];
+            taub=ones(nx,1)*taubt[1]|taubt[1:nage+pt-1];
+
+        else;
+            tr=trt[pt:pt+nage-1];
+            w=wt[pt:pt+nage-1];
+            r=rt[pt:pt+nage-1];
+            taub=taubt[pt:pt+nage-1];
+        endif;
+
+        if pt==ntrans;
+            kvec=kvecfinal;
+            nvec=nvecfinal;
+        endif;
+
+        k0=reshape(kvec,nvar1,1);
+        n0=reshape(nvec,nvar2,1);
+/* starting value x0 for sys1 is the opitmal policy function in the 
+   previous iteration; initial value in period ntrans: final steady state */
+        x0=k0|n0;
+            
+/* computation of the individual optimization problem given the factor price
+    sequence w,r,taub,zeta1, and tr */
+        {x,crit}=FixvMN1(x0,&Sys1);
+        x0=maxc(abs(Sys1(x)));
+        if x0>1e-4; "no steady state solution"; "maxc(crit): " maxc(crit); endif;
+
+
+        kvec=x[1:nvar1];
+        kvec=reshape(kvec,nage-1,nj);
+        nvec=x[nvar1+1:nvar];
+        nvec=reshape(nvec,nw,nj);
+
+        if pt==1;
+            save kvec1=kvec;
+            save nvec1=nvec;
+            save w,r,tr,taub,zeta1;
+        endif;
+        
+
+        load cvec;
+        /* update total savings: adding the newborn generation in each period pt, ppt+1,..,pt+nage */
+        it=0;
+        do until it==nage or (pt+it>ntrans);
+            it=it+1;
+            /* discount factor for the computation of the lifetime utility */
+            if it>1;
+                factor1=prodc(sp2[1:it-1])*(prodc(1+qbar))^(gam*(1-sigma));
+            else;
+                factor1=1;
+            endif;
+            if pt+it-1>0;
+                j=0;
+                do until j==nj;
+                    j=j+1;
+                    mass0=mass[it,pt+it-1]/nj;
+                    testmass[pt+it-1]=testmass[pt+it-1]+mass0;
+                    c0=cvec[it,j];
+                    if it>nw;
+                        w0=zeta1[it]*(1-taub[it]-tauw0)*w[it]*ef[j]; /* pensions */
+                        if pt>0;
+                            utilt[pt,j]=utilt[pt,j]+beta1^(it-1)*factor1*utility(cvec[it,j],1);
+                        endif;
+                    else;
+                        w0=(1-taub[it]-tauw0)*w[it]*ef[j]*efage[it]*nvec[it,j];
+                        if pt>0;
+                            utilt[pt,j]=utilt[pt,j]+beta1^(it-1)*factor1*utility(cvec[it,j],1-nvec[it,j]);
+                        endif;
+                    endif;
+                    if it==1;
+                        a0=0;
+                    else;
+                        a0=kvec[it-1,j];
+                    endif;
+                    if it==nage;
+                        a1=0;
+                    else;
+                        a1=kvec[it,j];
+                    endif;
+
+                    ct[pt+it-1]=ct[pt+it-1]+c0*mass0;
+                    at[pt+it-1]=at[pt+it-1]+a0*mass0;
+                    
+                    if it<nage;
+                        beqt[pt+it]=beqt[pt+it]+(1-sp2[it+1])*(1+r[it+1]*(1-taur0))*a1*(1+qbar)*mass0;
+                    endif;
+
+                    if it>nw;
+                        pen0=zeta1[it]*(1-tauw0-taub[it])*w[it]*ef[j];
+                        pent[pt+it-1]=pent[pt+it-1]+mass0*pen0;
+                    endif;
+        
+                    if it<=nw;
+                        bigltnew[pt+it-1]=bigltnew[pt+it-1]+mass0*nvec[it,j]*ef[j]*efage[it];
+                        waget[pt+it-1]=waget[pt+it-1]+mass0*nvec[it,j]*ef[j]*efage[it]*w[it];
+                    endif;
+                endo;
+            endif;
+        endo;
+
+    endo;
+
+    beqt[1]=beqt[2];    /* approximation */
+
+@
+    /* test of aggregation */
+    xlabel("transition period");
+    ylabel("");
+    title("total mass of population in each year");
+    xy(seqa(1,1,ntrans),testmass~pmass);
+    wait;
+
+    xlabel("transition period");
+    ylabel("");
+    title("testmass-pmass");
+    xy(seqa(1,1,ntrans),testmass-pmass);
+    wait;
+    
+
+    title("effective labor");
+    xy(seqa(1,1,ntrans),bigltnew./pmass~biglt);
+    wait;
+
+    title("bequests");
+    xy(seqa(1,1,ntrans),beqt[1:ntrans]./pmass);
+    wait;
+
+    title("savings a");
+    xy(seqa(1,1,ntrans),at./pmass);
+    wait;
+
+    title("wagetotal");
+    xy(seqa(1,1,ntrans),waget);
+    wait;
+
+    title("total pensions");
+    xy(seqa(1,1,ntrans),pent);
+    wait;
+
+    title("c");
+    xy(seqa(1,1,ntrans),ct);
+    wait;
+
+@
+    /* aggregation */
+    ktnew=zeros(ntrans,1);
+    kntnew=zeros(ntrans,1);
+    rtnew=zeros(ntrans,1);
+    wtnew=zeros(ntrans,1);
+    trtnew=zeros(ntrans,1);
+
+    pt=0;
+    do until pt==ntrans;
+        pt=pt+1;
+        kntnew[pt]=at[pt]/bigltnew[pt];
+        ktnew[pt]=at[pt]/pmass[pt];
+        trtnew[pt]=beqt[pt]+tauw0*waget[pt]+taur0*rt[pt]*at[pt]-gy*at[pt]^alpha*bigltnew[pt]^(1-alpha);
+        trtnew[pt]=trtnew[pt]/pmass[pt];
+        bigltnew[pt]=bigltnew[pt]/pmass[pt];
+        rtnew[pt]=alpha*kntnew[pt]^(alpha-1)-delta;
+        wtnew[pt]=(1-alpha)*kntnew[pt]^alpha;
+    endo;
+
+
+ @  
+    
+    title("capital intensity K/X: old and new");
+    xy(seqa(1,1,ntrans),kntnew~knt);
+    wait;
+
+
+    title("capital K/A: old and new");
+    xy(seqa(1,1,ntrans),ktnew~kt);
+    wait;
+
+    title("effective labor: old and new");
+    xy(seqa(1,1,ntrans),bigltnew~biglt);
+    wait;
+
+    title("new and old transfers");
+    xy(seqa(1,1,ntrans),trtnew~trt);
+    wait;
+
+    title("new and old wages");
+    xy(seqa(1,1,ntrans),wtnew~wt);
+    wait;
+
+    title("new and old r");
+    xy(seqa(1,1,ntrans),rtnew~rt);
+    wait;
+
+@
+    save utilt;
+
+    retp(ktnew,bigltnew,trtnew);
+endp;
+
